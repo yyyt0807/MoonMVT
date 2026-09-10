@@ -89,6 +89,21 @@ test "reader rejects length beyond remaining bytes" {
 }
 
 ///|
+test "reader reports an unsigned length overflow without a negative size" {
+  let reader = Reader::new(b"\xff\xff\xff\xff\xff\xff\xff\xff\xff\x01")
+  let mut code = ""
+  let mut message = ""
+  ignore(reader.read_bytes("payload")) catch {
+    error => {
+      code = error.code()
+      message = error.message()
+    }
+  }
+  assert_eq(code, "MOONMVT_OVERFLOW")
+  assert_eq(message, "numeric overflow at payload length")
+}
+
+///|
 test "reader enforces top-level tile size" {
   let standard = @limits.DecodeLimits::constrained()
   let tiny : @limits.DecodeLimits = {

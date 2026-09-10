@@ -156,11 +156,7 @@ pub fn Reader::read_length_range(
 ) -> ByteRange raise @error.MvtError {
   let length64 = self.read_varint(context + " length")
   if length64 > 2147483647UL {
-    raise @error.MvtError::ResourceLimit(
-      limit="submessage_bytes",
-      actual=length64.reinterpret_as_int64(),
-      maximum=self.limits.max_submessage_bytes.to_int64(),
-    )
+    raise @error.MvtError::NumericOverflow(path=context + " length")
   }
   let length = length64.to_int()
   self.limits.check_submessage_bytes(length)
