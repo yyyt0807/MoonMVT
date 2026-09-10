@@ -64,4 +64,3 @@ fn encode_value_message(
   }
   writer
 }
-

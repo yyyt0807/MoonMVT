@@ -15,7 +15,7 @@ pub fn encode_varint(value : UInt64) -> Bytes {
 pub fn append_varint(output : Array[Byte], initial : UInt64) -> Unit {
   let mut value = initial
   while value >= 0x80UL {
-    output.push((((value & 0x7fUL).to_int()) | 0x80).to_byte())
+    output.push(((value & 0x7fUL).to_int() | 0x80).to_byte())
     value = value >> 7
   }
   output.push(value.to_int().to_byte())
@@ -49,7 +49,7 @@ pub fn decode_varint(
       let used = cursor - offset
       if used != varint_length(value) {
         raise @error.MvtError::InvalidWire(
-          offset=offset,
+          offset~,
           detail="non-canonical varint encoding",
         )
       }
@@ -81,7 +81,7 @@ pub fn zigzag_encode_i64(value : Int64) -> UInt64 {
   if value >= 0L {
     value.reinterpret_as_uint64() * 2UL
   } else {
-    ((-(value + 1L)).reinterpret_as_uint64() * 2UL) + 1UL
+    (-(value + 1L)).reinterpret_as_uint64() * 2UL + 1UL
   }
 }
 
@@ -91,16 +91,16 @@ pub fn zigzag_decode_i64(value : UInt64) -> Int64 {
   if (value & 1UL) == 0UL {
     (value >> 1).reinterpret_as_int64()
   } else {
-    -((value >> 1).reinterpret_as_int64()) - 1L
+    -(value >> 1).reinterpret_as_int64() - 1L
   }
 }
 
 ///|
 pub fn zigzag_encode_i32(value : Int) -> UInt {
   if value >= 0 {
-    (value.reinterpret_as_uint() * 2U)
+    value.reinterpret_as_uint() * 2U
   } else {
-    ((-(value + 1)).reinterpret_as_uint() * 2U) + 1U
+    (-(value + 1)).reinterpret_as_uint() * 2U + 1U
   }
 }
 
@@ -109,7 +109,7 @@ pub fn zigzag_decode_i32(value : UInt) -> Int {
   if (value & 1U) == 0U {
     (value >> 1).reinterpret_as_int()
   } else {
-    -((value >> 1).reinterpret_as_int()) - 1
+    -(value >> 1).reinterpret_as_int() - 1
   }
 }
 
@@ -136,7 +136,7 @@ pub fn decode_field_key(
   let number64 = raw >> 3
   if number64 == 0UL || number64 > 536870911UL {
     raise @error.MvtError::InvalidWire(
-      offset=offset,
+      offset~,
       detail="field number is outside 1..536870911",
     )
   }

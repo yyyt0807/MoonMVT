@@ -44,7 +44,8 @@ test "canonicalization still enforces decode limits" {
     max_submessage_bytes: 2,
   }
   let mut rejected = false
-  ignore(canonicalize(b"abc", limits~)) catch { _ => rejected = true }
+  ignore(canonicalize(b"abc", limits~)) catch {
+    _ => rejected = true
+  }
   assert_true(rejected)
 }
-

@@ -16,7 +16,7 @@ pub fn Reader::new(
 ) -> Reader raise @error.MvtError {
   limits.validate()
   limits.check_tile_bytes(data.length())
-  { data, cursor: 0, end: data.length(), limits, unknown_fields: 0 }
+  { data, cursor: 0, end: data.length(), limits, unknown_fields: 0, }
 }
 
 ///|
@@ -70,10 +70,7 @@ pub fn Reader::read_varint(
   context : String,
 ) -> UInt64 raise @error.MvtError {
   if self.cursor >= self.end {
-    raise @error.MvtError::TruncatedInput(
-      offset=self.cursor,
-      context=context,
-    )
+    raise @error.MvtError::TruncatedInput(offset=self.cursor, context~)
   }
   let (value, next) = decode_varint_bounded(
     self.data,
@@ -109,7 +106,7 @@ fn decode_varint_bounded(
     if (byte.to_int() & 0x80) == 0 {
       if cursor - offset != varint_length(value) {
         raise @error.MvtError::InvalidWire(
-          offset=offset,
+          offset~,
           detail="non-canonical varint encoding in " + context,
         )
       }
@@ -118,7 +115,7 @@ fn decode_varint_bounded(
     shift += 7
   }
   if cursor >= end {
-    raise @error.MvtError::TruncatedInput(offset=cursor, context=context)
+    raise @error.MvtError::TruncatedInput(offset=cursor, context~)
   }
   raise @error.MvtError::NumericOverflow(path=context)
 }
@@ -168,7 +165,7 @@ pub fn Reader::read_length_range(
   let length = length64.to_int()
   self.limits.check_submessage_bytes(length)
   self.require_bytes(length, context)
-  let range : ByteRange = { start: self.cursor, end: self.cursor + length }
+  let range : ByteRange = { start: self.cursor, end: self.cursor + length, }
   self.cursor += length
   range
 }
@@ -198,7 +195,7 @@ pub fn Reader::read_string(
   let range = self.read_length_range(path)
   self.limits.check_string_bytes(range.length())
   @utf8.decode(self.data[range.start:range.end]) catch {
-    _ => raise @error.MvtError::InvalidUtf8(path=path)
+    _ => raise @error.MvtError::InvalidUtf8(path~)
   }
 }
 
@@ -248,10 +245,7 @@ fn Reader::require_bytes(
     raise @error.MvtError::InvalidArgument("byte count must not be negative")
   }
   if count > self.remaining() {
-    raise @error.MvtError::TruncatedInput(
-      offset=self.cursor,
-      context=context,
-    )
+    raise @error.MvtError::TruncatedInput(offset=self.cursor, context~)
   }
 }
 
@@ -274,7 +268,7 @@ pub fn Reader::read_packed_uint32(
     }
     let value = packed.read_varint(path)
     if value > 0xffffffffUL {
-      raise @error.MvtError::NumericOverflow(path=path)
+      raise @error.MvtError::NumericOverflow(path~)
     }
     values.push(value.to_int())
   }
@@ -302,7 +296,7 @@ pub fn Reader::read_packed_words(
     }
     let value = packed.read_varint(path)
     if value > 0xffffffffUL {
-      raise @error.MvtError::NumericOverflow(path=path)
+      raise @error.MvtError::NumericOverflow(path~)
     }
     values.push(value.to_uint())
   }

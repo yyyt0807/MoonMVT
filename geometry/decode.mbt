@@ -10,11 +10,11 @@ pub fn decode_geometry(
     Unknown => {
       if !words.is_empty() {
         raise @error.MvtError::InvalidGeometry(
-          path=path,
+          path~,
           detail="unknown geometry must have an empty command stream",
         )
       }
-      { geometry_type, paths: [] }
+      { geometry_type, paths: [], }
     }
     Point => decode_point_geometry(words, path)
     LineString => decode_line_geometry(words, path)
@@ -38,7 +38,7 @@ fn decode_point_geometry(
 ) -> DecodedGeometry raise @error.MvtError {
   if words.is_empty() {
     raise @error.MvtError::InvalidGeometry(
-      path=path,
+      path~,
       detail="point command stream is empty",
     )
   }
@@ -49,19 +49,24 @@ fn decode_point_geometry(
   let required = checked_parameter_end(1, header.count, path)
   if required != words.length() {
     raise @error.MvtError::InvalidGeometry(
-      path=path,
+      path~,
       detail="point geometry must contain exactly one MoveTo command",
     )
   }
-  let cursor : DecodeCursor = { x: 0L, y: 0L }
+  let cursor : DecodeCursor = { x: 0L, y: 0L, }
   let points : Array[@model.Point] = []
   let mut index = 1
   for point_index in 0..<header.count {
-    let (point, next) = decode_point(words, index, cursor, "\{path}.point[\{point_index}]")
+    let (point, next) = decode_point(
+      words,
+      index,
+      cursor,
+      "\{path}.point[\{point_index}]",
+    )
     points.push(point)
     index = next
   }
-  { geometry_type: @model.GeomType::Point, paths: [Path::open(points)] }
+  { geometry_type: @model.GeomType::Point, paths: [Path::open(points)], }
 }
 
 ///|
@@ -71,11 +76,11 @@ fn decode_line_geometry(
 ) -> DecodedGeometry raise @error.MvtError {
   if words.is_empty() {
     raise @error.MvtError::InvalidGeometry(
-      path=path,
+      path~,
       detail="line command stream is empty",
     )
   }
-  let cursor : DecodeCursor = { x: 0L, y: 0L }
+  let cursor : DecodeCursor = { x: 0L, y: 0L, }
   let paths : Array[Path] = []
   let mut index = 0
   let mut part = 0
@@ -97,7 +102,7 @@ fn decode_line_geometry(
     index = after_first
     if index >= words.length() {
       raise @error.MvtError::InvalidGeometry(
-        path=path,
+        path~,
         detail="line part is missing LineTo",
       )
     }
@@ -121,7 +126,7 @@ fn decode_line_geometry(
     paths.push(Path::open(points))
     part += 1
   }
-  { geometry_type: @model.GeomType::LineString, paths }
+  { geometry_type: @model.GeomType::LineString, paths, }
 }
 
 ///|
@@ -131,11 +136,11 @@ fn decode_polygon_geometry(
 ) -> DecodedGeometry raise @error.MvtError {
   if words.is_empty() {
     raise @error.MvtError::InvalidGeometry(
-      path=path,
+      path~,
       detail="polygon command stream is empty",
     )
   }
-  let cursor : DecodeCursor = { x: 0L, y: 0L }
+  let cursor : DecodeCursor = { x: 0L, y: 0L, }
   let paths : Array[Path] = []
   let mut index = 0
   let mut ring = 0
@@ -157,7 +162,7 @@ fn decode_polygon_geometry(
     index = after_first
     if index >= words.length() {
       raise @error.MvtError::InvalidGeometry(
-        path=path,
+        path~,
         detail="polygon ring is missing LineTo",
       )
     }
@@ -183,7 +188,7 @@ fn decode_polygon_geometry(
     }
     if index >= words.length() {
       raise @error.MvtError::InvalidGeometry(
-        path=path,
+        path~,
         detail="polygon ring is missing ClosePath",
       )
     }
@@ -198,7 +203,7 @@ fn decode_polygon_geometry(
     paths.push(Path::closed(points))
     ring += 1
   }
-  { geometry_type: @model.GeomType::Polygon, paths }
+  { geometry_type: @model.GeomType::Polygon, paths, }
 }
 
 ///|
@@ -216,7 +221,7 @@ fn decode_point(
 ) -> (@model.Point, Int) raise @error.MvtError {
   if index < 0 || index + 1 >= words.length() {
     raise @error.MvtError::InvalidGeometry(
-      path=path,
+      path~,
       detail="coordinate pair is truncated",
     )
   }
@@ -263,4 +268,3 @@ fn unexpected_command(
     detail="expected \{expected}, got \{actual.name()}",
   )
 }
-

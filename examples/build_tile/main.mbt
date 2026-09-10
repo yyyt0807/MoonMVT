@@ -58,4 +58,3 @@ fn run() -> Unit raise {
   println("decoded points: \{statistics.decoded_points}")
   println("canonical: \{@codec.is_canonical(bytes)}")
 }
-

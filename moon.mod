@@ -11,4 +11,3 @@ license = "Apache-2.0"
 keywords = [ "mvt", "vector-tile", "mapbox", "geospatial" ]
 
 description = "Pure MoonBit Mapbox Vector Tile 2.1 codec and tile builder"
-

@@ -5,7 +5,4 @@ import {
   "oyjh0381/moonmvt/query",
 }
 
-options(
-  "is-main": true,
-)
-
+pkgtype(kind: "executable")

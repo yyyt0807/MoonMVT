@@ -3,7 +3,7 @@
 pub fn validate_tile(tile : @model.Tile) -> Unit raise @error.MvtError {
   for layer_index, layer in tile.layers {
     let path = "layers[\{layer_index}]"
-    validate_layer(layer, path=path)
+    validate_layer(layer, path~)
     for earlier in 0..<layer_index {
       if tile.layers[earlier].name == layer.name {
         raise @error.MvtError::InvalidTile(
@@ -43,11 +43,7 @@ pub fn validate_layer(
     reject_nul(key, "\{path}.keys[\{key_index}]")
   }
   for feature_index, feature in layer.features {
-    validate_feature(
-      layer,
-      feature,
-      path="\{path}.features[\{feature_index}]",
-    )
+    validate_feature(layer, feature, path="\{path}.features[\{feature_index}]")
   }
 }
 
@@ -81,7 +77,11 @@ pub fn validate_feature(
     }
     tag_index += 2
   }
-  @geometry.validate_geometry(feature.geometry_type, feature.geometry, path=path + ".geometry")
+  @geometry.validate_geometry(
+    feature.geometry_type,
+    feature.geometry,
+    path=path + ".geometry",
+  )
   if feature.geometry_type == @model.GeomType::Polygon {
     @geometry.validate_polygon_rings(
       @geometry.decode_geometry(
@@ -99,7 +99,7 @@ fn reject_nul(value : String, path : String) -> Unit raise @error.MvtError {
   for character in value {
     if character == '\u0000' {
       raise @error.MvtError::InvalidTile(
-        path=path,
+        path~,
         detail="text must not contain NUL",
       )
     }

@@ -3,20 +3,17 @@ test "command headers match MVT examples" {
   assert_eq(command_header(CommandId::MoveTo, 1), 9U)
   assert_eq(command_header(CommandId::LineTo, 2), 18U)
   assert_eq(command_header(CommandId::ClosePath, 1), 15U)
-  assert_eq(parse_command_header(18U, "geometry"), { command: CommandId::LineTo, count: 2 })
+  assert_eq(parse_command_header(18U, "geometry"), {
+    command: CommandId::LineTo,
+    count: 2,
+  })
 }
 
 ///|
 test "point encoding delta-compresses one cursor" {
+  assert_eq(encode_points([@model.Point::new(25, 17)]), [9U, 50U, 34U])
   assert_eq(
-    encode_points([@model.Point::new(25, 17)]),
-    [9U, 50U, 34U],
-  )
-  assert_eq(
-    encode_points([
-      @model.Point::new(25, 17),
-      @model.Point::new(30, 10),
-    ]),
+    encode_points([@model.Point::new(25, 17), @model.Point::new(30, 10)]),
     [17U, 50U, 34U, 10U, 13U],
   )
 }
@@ -38,24 +35,27 @@ test "polygon encoding adds ClosePath without duplicate coordinate" {
     @model.Point::new(8, 11),
     @model.Point::new(3, 11),
   ]
-  assert_eq(
-    encode_polygons([ring]),
-    [9U, 6U, 12U, 26U, 10U, 0U, 0U, 10U, 9U, 0U, 15U],
-  )
+  assert_eq(encode_polygons([ring]), [
+    9U, 6U, 12U, 26U, 10U, 0U, 0U, 10U, 9U, 0U, 15U,
+  ])
 }
 
 ///|
 test "geometry encoders reject empty and undersized input" {
   let mut failures = 0
-  ignore(encode_points([])) catch { _ => failures += 1 }
-  ignore(encode_lines([])) catch { _ => failures += 1 }
-  ignore(encode_lines([[@model.Point::new(0, 0)]])) catch { _ => failures += 1 }
-  ignore(encode_polygons([])) catch { _ => failures += 1 }
-  ignore(
-    encode_polygons([
-      [@model.Point::new(0, 0), @model.Point::new(1, 0)],
-    ]),
-  ) catch {
+  ignore(encode_points([])) catch {
+    _ => failures += 1
+  }
+  ignore(encode_lines([])) catch {
+    _ => failures += 1
+  }
+  ignore(encode_lines([[@model.Point::new(0, 0)]])) catch {
+    _ => failures += 1
+  }
+  ignore(encode_polygons([])) catch {
+    _ => failures += 1
+  }
+  ignore(encode_polygons([[@model.Point::new(0, 0), @model.Point::new(1, 0)]])) catch {
     _ => failures += 1
   }
   assert_eq(failures, 5)
@@ -70,7 +70,9 @@ test "polygon input uses open ring convention" {
     @model.Point::new(0, 0),
   ]
   let mut rejected = false
-  ignore(encode_polygons([closed])) catch { _ => rejected = true }
+  ignore(encode_polygons([closed])) catch {
+    _ => rejected = true
+  }
   assert_true(rejected)
 }
 
@@ -82,7 +84,9 @@ test "polygon rejects three positions with fewer than three distinct points" {
     @model.Point::new(1, 0),
   ]
   let mut rejected = false
-  ignore(encode_polygons([degenerate])) catch { _ => rejected = true }
+  ignore(encode_polygons([degenerate])) catch {
+    _ => rejected = true
+  }
   assert_true(rejected)
 }
 
@@ -91,10 +95,7 @@ test "delta overflow is rejected before uint32 truncation" {
   let mut rejected = false
   ignore(
     encode_lines([
-      [
-        @model.Point::new(-2147483647 - 1, 0),
-        @model.Point::new(2147483647, 0),
-      ],
+      [@model.Point::new(-2147483647 - 1, 0), @model.Point::new(2147483647, 0)],
     ]),
   ) catch {
     _ => rejected = true
@@ -114,6 +115,8 @@ test "expanded geometry encoding enforces path closure by type" {
     paths: [Path::closed([@model.Point::new(0, 0), @model.Point::new(1, 1)])],
   }
   let mut rejected = false
-  ignore(encode_decoded(invalid)) catch { _ => rejected = true }
+  ignore(encode_decoded(invalid)) catch {
+    _ => rejected = true
+  }
   assert_true(rejected)
 }

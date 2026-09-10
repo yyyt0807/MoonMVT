@@ -39,7 +39,10 @@ pub fn inspect_feature(
 }
 
 ///|
-pub fn FeatureView::property(self : FeatureView, key : String) -> @model.MvtValue? {
+pub fn FeatureView::property(
+  self : FeatureView,
+  key : String,
+) -> @model.MvtValue? {
   for item in self.properties {
     if item.key == key {
       return Some(item.value)
@@ -92,7 +95,7 @@ pub fn filter_layer(
       features.push(feature)
     }
   }
-  @builder.compact_layer({ ..layer, features })
+  @builder.compact_layer({ ..layer, features, })
 }
 
 ///|
@@ -230,4 +233,3 @@ pub fn tile_statistics(
     layer_statistics: statistics,
   }
 }
-

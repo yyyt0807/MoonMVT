@@ -38,8 +38,7 @@ pub fn MvtError::message(self : MvtError) -> String {
     InvalidWire(offset~, detail~) =>
       "invalid protobuf wire data at byte \{offset}: \{detail}"
     InvalidTile(path~, detail~) => "invalid tile at \{path}: \{detail}"
-    InvalidGeometry(path~, detail~) =>
-      "invalid geometry at \{path}: \{detail}"
+    InvalidGeometry(path~, detail~) => "invalid geometry at \{path}: \{detail}"
     InvalidUtf8(path~) => "invalid UTF-8 at \{path}"
     NumericOverflow(path~) => "numeric overflow at \{path}"
     ResourceLimit(limit~, actual~, maximum~) =>
@@ -71,4 +70,3 @@ pub fn MvtError::is_malformed_input(self : MvtError) -> Bool {
     _ => false
   }
 }
-

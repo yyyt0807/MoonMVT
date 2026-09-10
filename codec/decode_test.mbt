@@ -46,7 +46,9 @@ test "decoder rejects missing required layer fields" {
     let tile = @wire.Writer::new()
     tile.write_message_field(3, layer)
     let mut rejected = false
-    ignore(decode_tile(tile.finish())) catch { _ => rejected = true }
+    ignore(decode_tile(tile.finish())) catch {
+      _ => rejected = true
+    }
     assert_true(rejected)
   }
 }
@@ -60,7 +62,9 @@ test "decoder rejects duplicate singular fields" {
   let tile = @wire.Writer::new()
   tile.write_message_field(3, layer)
   let mut rejected = false
-  ignore(decode_tile(tile.finish())) catch { _ => rejected = true }
+  ignore(decode_tile(tile.finish())) catch {
+    _ => rejected = true
+  }
   assert_true(rejected)
 }
 
@@ -78,7 +82,9 @@ test "decoder rejects a value with zero or multiple variants" {
     let tile = @wire.Writer::new()
     tile.write_message_field(3, layer)
     let mut rejected = false
-    ignore(decode_tile(tile.finish())) catch { _ => rejected = true }
+    ignore(decode_tile(tile.finish())) catch {
+      _ => rejected = true
+    }
     assert_true(rejected)
   }
 }
@@ -94,7 +100,9 @@ test "decoder rejects noncanonical boolean payload" {
   let tile = @wire.Writer::new()
   tile.write_message_field(3, layer)
   let mut rejected = false
-  ignore(decode_tile(tile.finish())) catch { _ => rejected = true }
+  ignore(decode_tile(tile.finish())) catch {
+    _ => rejected = true
+  }
   assert_true(rejected)
 }
 
@@ -106,14 +114,16 @@ test "decoder rejects a wire type mismatch" {
   let tile = @wire.Writer::new()
   tile.write_message_field(3, layer)
   let mut rejected = false
-  ignore(decode_tile(tile.finish())) catch { _ => rejected = true }
+  ignore(decode_tile(tile.finish())) catch {
+    _ => rejected = true
+  }
   assert_true(rejected)
 }
 
 ///|
 test "decoder enforces layer and feature count limits" {
   let standard = @limits.DecodeLimits::constrained()
-  let one_layer : @limits.DecodeLimits = { ..standard, max_layers: 1 }
+  let one_layer : @limits.DecodeLimits = { ..standard, max_layers: 1, }
   let layer = @wire.Writer::new()
   layer.write_string_field(1, "x")
   layer.write_varint_field(15, 2UL)
@@ -121,7 +131,9 @@ test "decoder enforces layer and feature count limits" {
   tile.write_message_field(3, layer)
   tile.write_message_field(3, layer)
   let mut rejected = false
-  ignore(decode_tile(tile.finish(), limits=one_layer)) catch { _ => rejected = true }
+  ignore(decode_tile(tile.finish(), limits=one_layer)) catch {
+    _ => rejected = true
+  }
   assert_true(rejected)
 }
 
@@ -142,7 +154,9 @@ test "decoder enforces packed geometry word limits" {
   let tile = @wire.Writer::new()
   tile.write_message_field(3, layer)
   let mut rejected = false
-  ignore(decode_tile(tile.finish(), limits=tiny)) catch { _ => rejected = true }
+  ignore(decode_tile(tile.finish(), limits=tiny)) catch {
+    _ => rejected = true
+  }
   assert_true(rejected)
 }
 
@@ -158,7 +172,7 @@ test "decoder preserves all numeric value variants" {
     @model.MvtValue::BoolValue(false),
   ]
   let tile : @model.Tile = {
-    layers: [{ ..original.layers[0], values: variants, features: [] }],
+    layers: [{ ..original.layers[0], values: variants, features: [], }],
   }
   let decoded = decode_tile(encode_tile(tile))
   assert_eq(decoded.layers[0].values.length(), variants.length())
@@ -166,4 +180,3 @@ test "decoder preserves all numeric value variants" {
     assert_true(decoded.layers[0].values[index].dictionary_equal(value))
   }
 }
-

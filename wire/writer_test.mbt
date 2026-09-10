@@ -44,7 +44,9 @@ test "packed uint32 uses canonical varints" {
 test "packed uint32 rejects negative caller values" {
   let writer = Writer::new()
   let mut rejected = false
-  writer.write_packed_uint32(1, [0, -1]) catch { _ => rejected = true }
+  writer.write_packed_uint32(1, [0, -1]) catch {
+    _ => rejected = true
+  }
   assert_true(rejected)
 }
 
@@ -60,10 +62,14 @@ test "signed field uses zigzag transform" {
 test "writer rejects illegal field numbers" {
   let writer = Writer::new()
   let mut zero_rejected = false
-  writer.write_varint_field(0, 1UL) catch { _ => zero_rejected = true }
+  writer.write_varint_field(0, 1UL) catch {
+    _ => zero_rejected = true
+  }
   assert_true(zero_rejected)
   let mut high_rejected = false
-  writer.write_varint_field(536870912, 1UL) catch { _ => high_rejected = true }
+  writer.write_varint_field(536870912, 1UL) catch {
+    _ => high_rejected = true
+  }
   assert_true(high_rejected)
 }
 
@@ -96,6 +102,6 @@ test "packed word writer preserves unsigned high values" {
   writer.write_packed_words(4, [0U, 0xffffffffU])
   let reader = Reader::new(writer.finish())
   let key = reader.read_key()
-  assert_eq(key, { number: 4, wire_type: WireType::LengthDelimited })
+  assert_eq(key, { number: 4, wire_type: WireType::LengthDelimited, })
   assert_eq(reader.read_packed_words("geometry", 2), [0U, 0xffffffffU])
 }

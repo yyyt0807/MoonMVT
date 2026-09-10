@@ -11,7 +11,13 @@ pub fn decode_tile(
     if key.number == 3 {
       reader.expect_wire(key, @wire.WireType::LengthDelimited, "tile.layers")
       limits.check_layers(layers.length() + 1)
-      layers.push(decode_layer(reader.read_subreader("tile.layers"), layers.length(), limits))
+      layers.push(
+        decode_layer(
+          reader.read_subreader("tile.layers"),
+          layers.length(),
+          limits,
+        ),
+      )
     } else {
       reader.skip_field(key)
     }
@@ -43,7 +49,11 @@ fn decode_layer(
         name = Some(reader.read_string(path + ".name"))
       }
       2 => {
-        reader.expect_wire(key, @wire.WireType::LengthDelimited, path + ".features")
+        reader.expect_wire(
+          key,
+          @wire.WireType::LengthDelimited,
+          path + ".features",
+        )
         limits.check_features(features.length() + 1)
         features.push(
           decode_feature(
@@ -59,7 +69,11 @@ fn decode_layer(
         keys.push(reader.read_string(path + ".keys[\{keys.length()}]"))
       }
       4 => {
-        reader.expect_wire(key, @wire.WireType::LengthDelimited, path + ".values")
+        reader.expect_wire(
+          key,
+          @wire.WireType::LengthDelimited,
+          path + ".values",
+        )
         limits.check_values(values.length() + 1)
         values.push(
           decode_value(
@@ -103,7 +117,7 @@ fn decode_layer(
         )
     },
   }
-  validate_layer(layer, path=path)
+  validate_layer(layer, path~)
   layer
 }
 
@@ -143,7 +157,11 @@ fn decode_feature(
         geometry_type = Some(@model.GeomType::from_number(raw, path + ".type"))
       }
       4 => {
-        reader.expect_wire(key, @wire.WireType::LengthDelimited, path + ".geometry")
+        reader.expect_wire(
+          key,
+          @wire.WireType::LengthDelimited,
+          path + ".geometry",
+        )
         let part = reader.read_packed_words(
           path + ".geometry",
           limits.max_geometry_words_per_feature - geometry.length(),
@@ -174,16 +192,26 @@ fn decode_value(
     let key = reader.read_key()
     match key.number {
       1 => {
-        reader.expect_wire(key, @wire.WireType::LengthDelimited, path + ".string_value")
+        reader.expect_wire(
+          key,
+          @wire.WireType::LengthDelimited,
+          path + ".string_value",
+        )
         ensure_absent(decoded is None, path)
-        decoded = Some(@model.MvtValue::StringValue(reader.read_string(path + ".string_value")))
+        decoded = Some(
+          @model.MvtValue::StringValue(
+            reader.read_string(path + ".string_value"),
+          ),
+        )
       }
       2 => {
         reader.expect_wire(key, @wire.WireType::Fixed32, path + ".float_value")
         ensure_absent(decoded is None, path)
         decoded = Some(
           @model.MvtValue::FloatValue(
-            Float::reinterpret_from_uint(reader.read_fixed32(path + ".float_value")),
+            Float::reinterpret_from_uint(
+              reader.read_fixed32(path + ".float_value"),
+            ),
           ),
         )
       }
@@ -208,7 +236,9 @@ fn decode_value(
       5 => {
         reader.expect_wire(key, @wire.WireType::Varint, path + ".uint_value")
         ensure_absent(decoded is None, path)
-        decoded = Some(@model.MvtValue::UIntValue(reader.read_varint(path + ".uint_value")))
+        decoded = Some(
+          @model.MvtValue::UIntValue(reader.read_varint(path + ".uint_value")),
+        )
       }
       6 => {
         reader.expect_wire(key, @wire.WireType::Varint, path + ".sint_value")
@@ -238,7 +268,7 @@ fn decode_value(
     Some(value) => value
     None =>
       raise @error.MvtError::InvalidTile(
-        path=path,
+        path~,
         detail="value message must contain exactly one typed value",
       )
   }
@@ -251,7 +281,7 @@ fn read_nonnegative_int(
 ) -> Int raise @error.MvtError {
   let raw = reader.read_varint(path)
   if raw > 2147483647UL {
-    raise @error.MvtError::NumericOverflow(path=path)
+    raise @error.MvtError::NumericOverflow(path~)
   }
   raw.to_int()
 }
@@ -263,10 +293,7 @@ fn read_positive_int(
 ) -> Int raise @error.MvtError {
   let value = read_nonnegative_int(reader, path)
   if value == 0 {
-    raise @error.MvtError::InvalidTile(
-      path=path,
-      detail="value must be positive",
-    )
+    raise @error.MvtError::InvalidTile(path~, detail="value must be positive")
   }
   value
 }
@@ -275,7 +302,7 @@ fn read_positive_int(
 fn ensure_absent(absent : Bool, path : String) -> Unit raise @error.MvtError {
   if !absent {
     raise @error.MvtError::InvalidTile(
-      path=path,
+      path~,
       detail="singular field appears more than once",
     )
   }

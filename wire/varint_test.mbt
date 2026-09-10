@@ -8,10 +8,7 @@ test "varint canonical vectors" {
     (300UL, b"\xac\x02"),
     (16384UL, b"\x80\x80\x01"),
     (0xffffffffUL, b"\xff\xff\xff\xff\x0f"),
-    (
-      0xffffffffffffffffUL,
-      b"\xff\xff\xff\xff\xff\xff\xff\xff\xff\x01",
-    ),
+    (0xffffffffffffffffUL, b"\xff\xff\xff\xff\xff\xff\xff\xff\xff\x01"),
   ]
   for vector in vectors {
     let (value, encoded) = vector
@@ -26,22 +23,8 @@ test "varint canonical vectors" {
 ///|
 test "varint round trips boundary neighborhoods" {
   let values : Array[UInt64] = [
-    0UL,
-    1UL,
-    2UL,
-    126UL,
-    127UL,
-    128UL,
-    129UL,
-    16383UL,
-    16384UL,
-    16385UL,
-    2097151UL,
-    2097152UL,
-    0x7fffffffUL,
-    0x80000000UL,
-    0x7fffffffffffffffUL,
-    0xffffffffffffffffUL,
+    0UL, 1UL, 2UL, 126UL, 127UL, 128UL, 129UL, 16383UL, 16384UL, 16385UL, 2097151UL,
+    2097152UL, 0x7fffffffUL, 0x80000000UL, 0x7fffffffffffffffUL, 0xffffffffffffffffUL,
   ]
   for value in values {
     let bytes = encode_varint(value)
@@ -62,14 +45,13 @@ test "varint supports nonzero offsets" {
 ///|
 test "varint rejects truncation overflow and noncanonical encodings" {
   let invalid : Array[Bytes] = [
-    b"\x80",
-    b"\x81\x00",
-    b"\xff\xff\xff\xff\xff\xff\xff\xff\xff\x02",
-    b"\x80\x80\x80\x80\x80\x80\x80\x80\x80\x80\x00",
+    b"\x80", b"\x81\x00", b"\xff\xff\xff\xff\xff\xff\xff\xff\xff\x02", b"\x80\x80\x80\x80\x80\x80\x80\x80\x80\x80\x00",
   ]
   for data in invalid {
     let mut rejected = false
-    ignore(decode_varint(data, 0)) catch { _ => rejected = true }
+    ignore(decode_varint(data, 0)) catch {
+      _ => rejected = true
+    }
     assert_true(rejected)
   }
 }
@@ -107,15 +89,18 @@ test "zigzag Int values round trip" {
 test "field keys validate number and wire type" {
   let raw = encode_field_key(15, WireType::LengthDelimited)
   assert_eq(raw, 122UL)
-  assert_eq(
-    decode_field_key(raw, 0),
-    { number: 15, wire_type: WireType::LengthDelimited },
-  )
+  assert_eq(decode_field_key(raw, 0), {
+    number: 15,
+    wire_type: WireType::LengthDelimited,
+  })
   let mut zero_rejected = false
-  ignore(decode_field_key(0UL, 4)) catch { _ => zero_rejected = true }
+  ignore(decode_field_key(0UL, 4)) catch {
+    _ => zero_rejected = true
+  }
   assert_true(zero_rejected)
   let mut group_rejected = false
-  ignore(decode_field_key(11UL, 0)) catch { _ => group_rejected = true }
+  ignore(decode_field_key(11UL, 0)) catch {
+    _ => group_rejected = true
+  }
   assert_true(group_rejected)
 }
-

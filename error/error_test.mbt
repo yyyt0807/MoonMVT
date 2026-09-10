@@ -43,7 +43,10 @@ test "messages include actionable locations" {
     "truncated input at byte 7 while reading feature",
   )
   assert_eq(
-    MvtError::InvalidGeometry(path="layers[2].features[4]", detail="missing MoveTo").message(),
+    MvtError::InvalidGeometry(
+      path="layers[2].features[4]",
+      detail="missing MoveTo",
+    ).message(),
     "invalid geometry at layers[2].features[4]: missing MoveTo",
   )
   assert_eq(

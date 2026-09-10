@@ -8,8 +8,10 @@ pub fn encode_points(
       "point geometry requires at least one point",
     )
   }
-  let output : Array[UInt] = [command_header(CommandId::MoveTo, points.length())]
-  let cursor : Cursor = { x: 0L, y: 0L }
+  let output : Array[UInt] = [
+    command_header(CommandId::MoveTo, points.length()),
+  ]
+  let cursor : Cursor = { x: 0L, y: 0L, }
   for point in points {
     append_point(output, cursor, point, "point")
   }
@@ -27,7 +29,7 @@ pub fn encode_lines(
     )
   }
   let output : Array[UInt] = []
-  let cursor : Cursor = { x: 0L, y: 0L }
+  let cursor : Cursor = { x: 0L, y: 0L, }
   for index, line in lines {
     if line.length() < 2 {
       raise @error.MvtError::InvalidArgument(
@@ -61,7 +63,7 @@ pub fn encode_polygons(
     )
   }
   let output : Array[UInt] = []
-  let cursor : Cursor = { x: 0L, y: 0L }
+  let cursor : Cursor = { x: 0L, y: 0L, }
   for index, ring in rings {
     validate_open_ring_input(ring, index)
     output.push(command_header(CommandId::MoveTo, 1))
@@ -156,7 +158,7 @@ fn append_point(
 ///|
 fn check_delta(value : Int64, path : String) -> Unit raise @error.MvtError {
   if value < -2147483648L || value > 2147483647L {
-    raise @error.MvtError::NumericOverflow(path=path)
+    raise @error.MvtError::NumericOverflow(path~)
   }
 }
 

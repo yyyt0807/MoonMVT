@@ -27,11 +27,15 @@ test "all public counters accept their exact ceilings" {
 test "counters reject values above their ceilings" {
   let limits = DecodeLimits::constrained()
   let mut failures = 0
-  limits.check_layers(limits.max_layers + 1) catch { _ => failures += 1 }
+  limits.check_layers(limits.max_layers + 1) catch {
+    _ => failures += 1
+  }
   limits.check_features(limits.max_features_per_layer + 1) catch {
     _ => failures += 1
   }
-  limits.check_keys(limits.max_keys_per_layer + 1) catch { _ => failures += 1 }
+  limits.check_keys(limits.max_keys_per_layer + 1) catch {
+    _ => failures += 1
+  }
   limits.check_values(limits.max_values_per_layer + 1) catch {
     _ => failures += 1
   }
@@ -65,9 +69,11 @@ test "negative counter is caller misuse instead of a resource limit" {
 ///|
 test "invalid configurations are rejected" {
   let standard = DecodeLimits::standard()
-  let zero_layers : DecodeLimits = { ..standard, max_layers: 0 }
+  let zero_layers : DecodeLimits = { ..standard, max_layers: 0, }
   let mut zero_rejected = false
-  zero_layers.validate() catch { _ => zero_rejected = true }
+  zero_layers.validate() catch {
+    _ => zero_rejected = true
+  }
   assert_true(zero_rejected)
   let inconsistent : DecodeLimits = {
     ..standard,
@@ -75,7 +81,8 @@ test "invalid configurations are rejected" {
     max_submessage_bytes: 11,
   }
   let mut inconsistent_rejected = false
-  inconsistent.validate() catch { _ => inconsistent_rejected = true }
+  inconsistent.validate() catch {
+    _ => inconsistent_rejected = true
+  }
   assert_true(inconsistent_rejected)
 }
-

@@ -3,16 +3,16 @@ test "reader traverses every supported wire type" {
   let data = b"\x08\x96\x01\x11\x08\x07\x06\x05\x04\x03\x02\x01\x1a\x03abc\x25\x04\x03\x02\x01"
   let reader = Reader::new(data)
   let k1 = reader.read_key()
-  assert_eq(k1, { number: 1, wire_type: WireType::Varint })
+  assert_eq(k1, { number: 1, wire_type: WireType::Varint, })
   assert_eq(reader.read_varint("one"), 150UL)
   let k2 = reader.read_key()
-  assert_eq(k2, { number: 2, wire_type: WireType::Fixed64 })
+  assert_eq(k2, { number: 2, wire_type: WireType::Fixed64, })
   assert_eq(reader.read_fixed64("two"), 0x0102030405060708UL)
   let k3 = reader.read_key()
-  assert_eq(k3, { number: 3, wire_type: WireType::LengthDelimited })
+  assert_eq(k3, { number: 3, wire_type: WireType::LengthDelimited, })
   assert_eq(reader.read_string("three"), "abc")
   let k4 = reader.read_key()
-  assert_eq(k4, { number: 4, wire_type: WireType::Fixed32 })
+  assert_eq(k4, { number: 4, wire_type: WireType::Fixed32, })
   assert_eq(reader.read_fixed32("four"), 0x01020304U)
   assert_true(reader.is_done())
 }
@@ -61,7 +61,9 @@ test "bounded reader detects a varint crossing submessage boundary" {
   let parent = Reader::new(b"\x01\x80\x01")
   let child = parent.read_subreader("child")
   let mut rejected = false
-  ignore(child.read_varint("child value")) catch { _ => rejected = true }
+  ignore(child.read_varint("child value")) catch {
+    _ => rejected = true
+  }
   assert_true(rejected)
   assert_eq(parent.remaining(), 1)
 }
@@ -70,7 +72,9 @@ test "bounded reader detects a varint crossing submessage boundary" {
 test "string reader rejects invalid UTF-8" {
   let reader = Reader::new(b"\x02\xc3\x28")
   let mut rejected = false
-  ignore(reader.read_string("layer.name")) catch { _ => rejected = true }
+  ignore(reader.read_string("layer.name")) catch {
+    _ => rejected = true
+  }
   assert_true(rejected)
 }
 
@@ -78,16 +82,24 @@ test "string reader rejects invalid UTF-8" {
 test "reader rejects length beyond remaining bytes" {
   let reader = Reader::new(b"\x05abc")
   let mut rejected = false
-  ignore(reader.read_bytes("payload")) catch { _ => rejected = true }
+  ignore(reader.read_bytes("payload")) catch {
+    _ => rejected = true
+  }
   assert_true(rejected)
 }
 
 ///|
 test "reader enforces top-level tile size" {
   let standard = @limits.DecodeLimits::constrained()
-  let tiny : @limits.DecodeLimits = { ..standard, max_tile_bytes: 2, max_submessage_bytes: 2 }
+  let tiny : @limits.DecodeLimits = {
+    ..standard,
+    max_tile_bytes: 2,
+    max_submessage_bytes: 2,
+  }
   let mut rejected = false
-  ignore(Reader::new(b"abc", limits=tiny)) catch { _ => rejected = true }
+  ignore(Reader::new(b"abc", limits=tiny)) catch {
+    _ => rejected = true
+  }
   assert_true(rejected)
 }
 

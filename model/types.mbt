@@ -39,7 +39,7 @@ pub fn GeomType::from_number(
     3 => Polygon
     _ =>
       raise @error.MvtError::InvalidTile(
-        path=path,
+        path~,
         detail="geometry type must be in 0..3",
       )
   }
@@ -55,12 +55,12 @@ pub(all) struct Point {
 
 ///|
 pub fn Point::new(x : Int, y : Int) -> Point {
-  { x, y }
+  { x, y, }
 }
 
 ///|
 pub fn Point::translate(self : Point, dx : Int, dy : Int) -> Point {
-  { x: self.x + dx, y: self.y + dy }
+  { x: self.x + dx, y: self.y + dy, }
 }
 
 ///|
@@ -79,16 +79,32 @@ pub(all) struct Bounds {
 
 ///|
 pub fn Bounds::from_point(point : Point) -> Bounds {
-  { min_x: point.x, min_y: point.y, max_x: point.x, max_y: point.y }
+  { min_x: point.x, min_y: point.y, max_x: point.x, max_y: point.y, }
 }
 
 ///|
 pub fn Bounds::include_point(self : Bounds, point : Point) -> Bounds {
   {
-    min_x: if point.x < self.min_x { point.x } else { self.min_x },
-    min_y: if point.y < self.min_y { point.y } else { self.min_y },
-    max_x: if point.x > self.max_x { point.x } else { self.max_x },
-    max_y: if point.y > self.max_y { point.y } else { self.max_y },
+    min_x: if point.x < self.min_x {
+      point.x
+    } else {
+      self.min_x
+    },
+    min_y: if point.y < self.min_y {
+      point.y
+    } else {
+      self.min_y
+    },
+    max_x: if point.x > self.max_x {
+      point.x
+    } else {
+      self.max_x
+    },
+    max_y: if point.y > self.max_y {
+      point.y
+    } else {
+      self.max_y
+    },
   }
 }
 
@@ -128,17 +144,17 @@ pub(all) struct Feature {
 
 ///|
 pub fn Feature::empty(geometry_type : GeomType) -> Feature {
-  { id: None, tags: [], geometry_type, geometry: [] }
+  { id: None, tags: [], geometry_type, geometry: [], }
 }
 
 ///|
 pub fn Feature::with_id(self : Feature, id : UInt64) -> Feature {
-  { ..self, id: Some(id) }
+  { ..self, id: Some(id), }
 }
 
 ///|
 pub fn Feature::without_id(self : Feature) -> Feature {
-  { ..self, id: None }
+  { ..self, id: None, }
 }
 
 ///|
@@ -159,7 +175,7 @@ pub(all) struct Layer {
 
 ///|
 pub fn Layer::empty(name : String, extent? : Int = 4096) -> Layer {
-  { name, features: [], keys: [], values: [], extent, version: 2 }
+  { name, features: [], keys: [], values: [], extent, version: 2, }
 }
 
 ///|
@@ -179,7 +195,7 @@ pub(all) struct Tile {
 
 ///|
 pub fn Tile::empty() -> Tile {
-  { layers: [] }
+  { layers: [], }
 }
 
 ///|
@@ -200,5 +216,9 @@ pub(all) struct TileSummary {
 
 ///|
 fn abs64(value : Int64) -> Int64 {
-  if value < 0L { -value } else { value }
+  if value < 0L {
+    -value
+  } else {
+    value
+  }
 }

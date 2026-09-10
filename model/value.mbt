@@ -106,10 +106,7 @@ pub fn MvtValue::as_double(self : MvtValue) -> Double? {
 ///|
 /// Equality used for deterministic value dictionary interning. IEEE NaN values
 /// are interned by their exact payload bits rather than by floating comparison.
-pub fn MvtValue::dictionary_equal(
-  self : MvtValue,
-  other : MvtValue,
-) -> Bool {
+pub fn MvtValue::dictionary_equal(self : MvtValue, other : MvtValue) -> Bool {
   match (self, other) {
     (StringValue(left), StringValue(right)) => left == right
     (FloatValue(left), FloatValue(right)) =>
@@ -133,4 +130,3 @@ pub fn MvtValue::is_finite(self : MvtValue) -> Bool {
     _ => true
   }
 }
-

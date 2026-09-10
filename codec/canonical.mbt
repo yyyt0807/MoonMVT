@@ -31,4 +31,3 @@ pub fn is_canonical(
 ) -> Bool raise @error.MvtError {
   !canonicalize(data, limits~).changed
 }
-

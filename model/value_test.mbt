@@ -40,9 +40,7 @@ test "dictionary equality distinguishes wire variants" {
       MvtValue::StringValue("road"),
     ),
   )
-  assert_false(
-    MvtValue::IntValue(1L).dictionary_equal(MvtValue::SIntValue(1L)),
-  )
+  assert_false(MvtValue::IntValue(1L).dictionary_equal(MvtValue::SIntValue(1L)))
   assert_false(
     MvtValue::FloatValue(1.0).dictionary_equal(MvtValue::DoubleValue(1.0)),
   )

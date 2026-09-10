@@ -53,9 +53,8 @@ pub fn wire_type_from_number(
     5 => Fixed32
     _ =>
       raise @error.MvtError::InvalidWire(
-        offset=offset,
+        offset~,
         detail="unsupported wire type \{value}",
       )
   }
 }
-

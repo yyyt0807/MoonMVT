@@ -100,12 +100,7 @@ test "all value variants encode one schema field" {
   ]
   for value in variants {
     let tile : @model.Tile = {
-      layers: [
-        {
-          ..@model.Layer::empty("values"),
-          values: [value],
-        },
-      ],
+      layers: [{ ..@model.Layer::empty("values"), values: [value], }],
     }
     assert_true(encode_tile(tile).length() > 0)
   }
@@ -115,11 +110,13 @@ test "all value variants encode one schema field" {
 test "validation rejects duplicate and empty layer names" {
   let empty = @model.Layer::empty("")
   let mut empty_rejected = false
-  ignore(encode_tile({ layers: [empty] })) catch { _ => empty_rejected = true }
+  ignore(encode_tile({ layers: [empty], })) catch {
+    _ => empty_rejected = true
+  }
   assert_true(empty_rejected)
   let repeated = @model.Layer::empty("roads")
   let mut duplicate_rejected = false
-  ignore(encode_tile({ layers: [repeated, repeated] })) catch {
+  ignore(encode_tile({ layers: [repeated, repeated], })) catch {
     _ => duplicate_rejected = true
   }
   assert_true(duplicate_rejected)
@@ -128,10 +125,12 @@ test "validation rejects duplicate and empty layer names" {
 ///|
 test "validation rejects unsupported version and extent" {
   let base = @model.Layer::empty("roads")
-  let invalid = [{ ..base, version: 1 }, { ..base, extent: 0 }]
+  let invalid = [{ ..base, version: 1, }, { ..base, extent: 0, }]
   for layer in invalid {
     let mut rejected = false
-    ignore(encode_tile({ layers: [layer] })) catch { _ => rejected = true }
+    ignore(encode_tile({ layers: [layer], })) catch {
+      _ => rejected = true
+    }
     assert_true(rejected)
   }
 }
@@ -142,9 +141,14 @@ test "validation rejects bad property references" {
     ..@model.Feature::empty(@model.GeomType::Unknown),
     tags: [0, 0],
   }
-  let layer : @model.Layer = { ..@model.Layer::empty("x"), features: [feature] }
+  let layer : @model.Layer = {
+    ..@model.Layer::empty("x"),
+    features: [feature],
+  }
   let mut rejected = false
-  ignore(encode_tile({ layers: [layer] })) catch { _ => rejected = true }
+  ignore(encode_tile({ layers: [layer], })) catch {
+    _ => rejected = true
+  }
   assert_true(rejected)
 }
 
@@ -156,8 +160,13 @@ test "validation rejects malformed geometry before writing bytes" {
     geometry_type: @model.GeomType::LineString,
     geometry: [9U, 0U, 0U],
   }
-  let layer : @model.Layer = { ..@model.Layer::empty("x"), features: [feature] }
+  let layer : @model.Layer = {
+    ..@model.Layer::empty("x"),
+    features: [feature],
+  }
   let mut rejected = false
-  ignore(encode_tile({ layers: [layer] })) catch { _ => rejected = true }
+  ignore(encode_tile({ layers: [layer], })) catch {
+    _ => rejected = true
+  }
   assert_true(rejected)
 }

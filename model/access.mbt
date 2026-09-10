@@ -48,7 +48,10 @@ pub fn Layer::resolve_properties(
         detail="value index \{value_index} is outside dictionary",
       )
     }
-    properties.push({ key: self.keys[key_index], value: self.values[value_index] })
+    properties.push({
+      key: self.keys[key_index],
+      value: self.values[value_index],
+    })
     index += 2
   }
   properties
@@ -124,5 +127,5 @@ pub fn Layer::filter_features(
       features.push(feature)
     }
   }
-  { ..self, features }
+  { ..self, features, }
 }

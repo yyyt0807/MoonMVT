@@ -45,7 +45,7 @@ fn build_integration_tile() -> @model.Tile raise {
     ],
     id=Some(102UL),
   )
-  { layers: [layer.finish()] }
+  { layers: [layer.finish()], }
 }
 
 ///|
@@ -61,7 +61,10 @@ test "typed builders and codec form an exact logical round trip" {
 test "buffer coordinates outside extent survive round trip" {
   let decoded = @codec.decode_tile(@codec.encode_tile(build_integration_tile()))
   let point = @query.inspect_feature(decoded.layers[0], 0)
-  assert_eq(point.bounds, Some({ min_x: -16, min_y: 20, max_x: 8200, max_y: 4000 }))
+  assert_eq(
+    point.bounds,
+    Some({ min_x: -16, min_y: 20, max_x: 8200, max_y: 4000, }),
+  )
 }
 
 ///|
@@ -85,14 +88,11 @@ test "filtered output has compact properties and stays canonical" {
   )
   assert_eq(roads.features.length(), 1)
   assert_eq(roads.keys, ["kind", "rank"])
-  assert_eq(
-    roads.values,
-    [
-      @model.MvtValue::StringValue("road"),
-      @model.MvtValue::UIntValue(2UL),
-    ],
-  )
-  let bytes = @codec.encode_tile({ layers: [roads] })
+  assert_eq(roads.values, [
+    @model.MvtValue::StringValue("road"),
+    @model.MvtValue::UIntValue(2UL),
+  ])
+  let bytes = @codec.encode_tile({ layers: [roads], })
   assert_true(@codec.is_canonical(bytes))
 }
 
@@ -120,14 +120,19 @@ test "decoder result does not alias mutable encoder inputs" {
 ///|
 test "wire unknown groups are rejected instead of skipped ambiguously" {
   let mut rejected = false
-  ignore(@codec.decode_tile(b"\x0b\x0c")) catch { _ => rejected = true }
+  ignore(@codec.decode_tile(b"\x0b\x0c")) catch {
+    _ => rejected = true
+  }
   assert_true(rejected)
 }
 
 ///|
 test "constrained limits still accept a normal application tile" {
   let bytes = @codec.encode_tile(build_integration_tile())
-  let tile = @codec.decode_tile(bytes, limits=@limits.DecodeLimits::constrained())
+  let tile = @codec.decode_tile(
+    bytes,
+    limits=@limits.DecodeLimits::constrained(),
+  )
   assert_eq(tile.layers.length(), 1)
   assert_eq(tile.layers[0].features.length(), 3)
 }

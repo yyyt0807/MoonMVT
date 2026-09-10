@@ -28,7 +28,10 @@ test "feature views resolve properties geometry and bounds" {
   assert_eq(view.geometry_type, @model.GeomType::Point)
   assert_eq(view.point_count, 2)
   assert_eq(view.path_count, 1)
-  assert_eq(view.bounds, Some({ min_x: 100, min_y: 190, max_x: 110, max_y: 200 }))
+  assert_eq(
+    view.bounds,
+    Some({ min_x: 100, min_y: 190, max_x: 110, max_y: 200, }),
+  )
   assert_eq(view.property("name"), Some(@model.MvtValue::StringValue("Market")))
   assert_true(view.has_property("capital"))
   assert_false(view.has_property("missing"))
@@ -44,9 +47,15 @@ test "property equality preserves MVT value kinds" {
 ///|
 test "bounds intersection treats touching edges as intersection" {
   let view = inspect_feature(query_fixture(), 0)
-  assert_true(view.intersects_bounds({ min_x: 10, min_y: 20, max_x: 10, max_y: 20 }))
-  assert_true(view.intersects_bounds({ min_x: 0, min_y: 0, max_x: 10, max_y: 20 }))
-  assert_false(view.intersects_bounds({ min_x: 11, min_y: 20, max_x: 20, max_y: 30 }))
+  assert_true(
+    view.intersects_bounds({ min_x: 10, min_y: 20, max_x: 10, max_y: 20, }),
+  )
+  assert_true(
+    view.intersects_bounds({ min_x: 0, min_y: 0, max_x: 10, max_y: 20, }),
+  )
+  assert_false(
+    view.intersects_bounds({ min_x: 11, min_y: 20, max_x: 20, max_y: 30, }),
+  )
 }
 
 ///|
@@ -60,13 +69,10 @@ test "property filters compact dictionaries" {
   assert_eq(capital.features.length(), 1)
   assert_eq(capital.features[0].id, Some(1UL))
   assert_eq(capital.keys, ["name", "capital"])
-  assert_eq(
-    capital.values,
-    [
-      @model.MvtValue::StringValue("Harbor"),
-      @model.MvtValue::BoolValue(true),
-    ],
-  )
+  assert_eq(capital.values, [
+    @model.MvtValue::StringValue("Harbor"),
+    @model.MvtValue::BoolValue(true),
+  ])
 }
 
 ///|
@@ -74,10 +80,12 @@ test "spatial and presence filters retain feature order" {
   let layer = query_fixture()
   let all = filter_has_property(layer, "name")
   assert_eq(all.features.map(feature => feature.id), [Some(1UL), Some(2UL)])
-  let distant = filter_intersects(
-    layer,
-    { min_x: 90, min_y: 180, max_x: 120, max_y: 220 },
-  )
+  let distant = filter_intersects(layer, {
+    min_x: 90,
+    min_y: 180,
+    max_x: 120,
+    max_y: 220,
+  })
   assert_eq(distant.features.map(feature => feature.id), [Some(2UL)])
 }
 
@@ -105,8 +113,8 @@ test "layer statistics count logical and encoded sizes" {
 ///|
 test "tile statistics aggregate layers in order" {
   let first = query_fixture()
-  let second : @model.Layer = { ..@model.Layer::empty("empty"), extent: 256 }
-  let stats = tile_statistics({ layers: [first, second] })
+  let second : @model.Layer = { ..@model.Layer::empty("empty"), extent: 256, }
+  let stats = tile_statistics({ layers: [first, second], })
   assert_eq(stats.layers, 2)
   assert_eq(stats.features, 2)
   assert_eq(stats.properties, 4)
@@ -119,8 +127,9 @@ test "inspect feature rejects index outside the layer" {
   let layer = query_fixture()
   for index in [-1, 2] {
     let mut rejected = false
-    ignore(inspect_feature(layer, index)) catch { _ => rejected = true }
+    ignore(inspect_feature(layer, index)) catch {
+      _ => rejected = true
+    }
     assert_true(rejected)
   }
 }
-

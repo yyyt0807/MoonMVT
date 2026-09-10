@@ -6,7 +6,7 @@ pub(all) struct Writer {
 
 ///|
 pub fn Writer::new() -> Writer {
-  { output: [] }
+  { output: [], }
 }
 
 ///|

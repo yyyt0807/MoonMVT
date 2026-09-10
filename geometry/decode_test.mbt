@@ -48,10 +48,10 @@ test "polygon command stream round trips without duplicate closure point" {
 
 ///|
 test "unknown geometry accepts only an empty stream" {
-  assert_eq(
-    decode_geometry(@model.GeomType::Unknown, []),
-    { geometry_type: @model.GeomType::Unknown, paths: [] },
-  )
+  assert_eq(decode_geometry(@model.GeomType::Unknown, []), {
+    geometry_type: @model.GeomType::Unknown,
+    paths: [],
+  })
   let mut rejected = false
   ignore(decode_geometry(@model.GeomType::Unknown, [9U, 0U, 0U])) catch {
     _ => rejected = true
@@ -72,19 +72,16 @@ test "geometry grammar rejects misplaced commands" {
   for item in invalid {
     let (kind, words) = item
     let mut rejected = false
-    ignore(decode_geometry(kind, words)) catch { _ => rejected = true }
+    ignore(decode_geometry(kind, words)) catch {
+      _ => rejected = true
+    }
     assert_true(rejected)
   }
 }
 
 ///|
 test "geometry decoder rejects truncated coordinate pairs" {
-  let invalid = [
-    [9U],
-    [9U, 2U],
-    [17U, 2U, 2U],
-    [17U, 2U, 2U, 2U],
-  ]
+  let invalid = [[9U], [9U, 2U], [17U, 2U, 2U], [17U, 2U, 2U, 2U]]
   for words in invalid {
     let mut rejected = false
     ignore(decode_geometry(@model.GeomType::Point, words)) catch {
@@ -144,7 +141,7 @@ test "geometry analysis reports bounds duplicates and lengths" {
   }
   assert_eq(
     geometry_bounds(geometry),
-    Some({ min_x: -2, min_y: 5, max_x: 3, max_y: 9 }),
+    Some({ min_x: -2, min_y: 5, max_x: 3, max_y: 9, }),
   )
   assert_eq(path_duplicate_step_count(path), 1)
   assert_eq(path_distinct_point_count(path), 3)
@@ -170,8 +167,9 @@ test "polygon ring validator rejects hole before exterior and zero area" {
       paths: [ring],
     }
     let mut rejected = false
-    validate_polygon_rings(geometry) catch { _ => rejected = true }
+    validate_polygon_rings(geometry) catch {
+      _ => rejected = true
+    }
     assert_true(rejected)
   }
 }
-

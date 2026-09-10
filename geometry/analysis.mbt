@@ -103,7 +103,9 @@ pub fn path_manhattan_length(path : Path) -> Int64 {
     total += path.points[index - 1].manhattan_distance(path.points[index])
   }
   if path.closed && path.points.length() > 1 {
-    total += path.points[path.points.length() - 1].manhattan_distance(path.points[0])
+    total += path.points[path.points.length() - 1].manhattan_distance(
+      path.points[0],
+    )
   }
   total
 }
@@ -169,4 +171,3 @@ pub fn validate_polygon_rings(
     }
   }
 }
-

@@ -9,7 +9,7 @@ pub(all) struct FeatureInput {
 
 ///|
 pub fn property(key : String, value : @model.MvtValue) -> @model.Property {
-  { key, value }
+  { key, value, }
 }
 
 ///|
@@ -19,7 +19,7 @@ pub fn FeatureInput::raw(
   properties? : Array[@model.Property] = [],
   id? : UInt64? = None,
 ) -> FeatureInput {
-  { id, properties, geometry_type, geometry }
+  { id, properties, geometry_type, geometry, }
 }
 
 ///|
@@ -60,12 +60,7 @@ pub fn FeatureInput::polygons(
   @geometry.validate_polygon_rings(
     @geometry.decode_geometry(@model.GeomType::Polygon, geometry),
   )
-  {
-    id,
-    properties,
-    geometry_type: @model.GeomType::Polygon,
-    geometry,
-  }
+  { id, properties, geometry_type: @model.GeomType::Polygon, geometry, }
 }
 
 ///|
@@ -89,7 +84,7 @@ pub fn LayerBuilder::new(
   if extent <= 0 {
     raise @error.MvtError::InvalidArgument("layer extent must be positive")
   }
-  { name, extent, features: [], keys: [], values: [] }
+  { name, extent, features: [], keys: [], values: [], }
 }
 
 ///|
@@ -126,7 +121,7 @@ pub(all) struct TileBuilder {
 
 ///|
 pub fn TileBuilder::new() -> TileBuilder {
-  { layers: [] }
+  { layers: [], }
 }
 
 ///|
@@ -136,6 +131,5 @@ pub fn TileBuilder::layer_count(self : TileBuilder) -> Int {
 
 ///|
 pub fn TileBuilder::finish(self : TileBuilder) -> @model.Tile {
-  { layers: self.layers.copy() }
+  { layers: self.layers.copy(), }
 }
-

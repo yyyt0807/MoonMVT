@@ -7,12 +7,12 @@ pub(all) struct Path {
 
 ///|
 pub fn Path::open(points : Array[@model.Point]) -> Path {
-  { points, closed: false }
+  { points, closed: false, }
 }
 
 ///|
 pub fn Path::closed(points : Array[@model.Point]) -> Path {
-  { points, closed: true }
+  { points, closed: true, }
 }
 
 ///|
@@ -22,7 +22,11 @@ pub fn Path::is_empty(self : Path) -> Bool {
 
 ///|
 pub fn Path::first(self : Path) -> @model.Point? {
-  if self.points.is_empty() { None } else { Some(self.points[0]) }
+  if self.points.is_empty() {
+    None
+  } else {
+    Some(self.points[0])
+  }
 }
 
 ///|
@@ -90,7 +94,7 @@ pub fn CommandId::from_number(
     7U => ClosePath
     _ =>
       raise @error.MvtError::InvalidGeometry(
-        path=path,
+        path~,
         detail="unknown command id \{value}",
       )
   }
@@ -123,9 +127,9 @@ pub fn parse_command_header(
   let count = (word >> 3).reinterpret_as_int()
   if count == 0 {
     raise @error.MvtError::InvalidGeometry(
-      path=path,
+      path~,
       detail="command count must not be zero",
     )
   }
-  { command: CommandId::from_number(word & 7U, path), count }
+  { command: CommandId::from_number(word & 7U, path), count, }
 }
