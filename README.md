@@ -20,7 +20,7 @@ MoonMVT 是纯 MoonBit 实现的 Mapbox Vector Tile 2.1 双向编解码与构建
 
 ## 安装与验证
 
-发布后可使用 `moon add oyjh0381/moonmvt@0.1.0`。本地仓库执行：
+发布后可使用 `moon add yyyt0807/moonmvt@0.1.0`。本地仓库执行：
 
 ```text
 moon check --target all --deny-warn

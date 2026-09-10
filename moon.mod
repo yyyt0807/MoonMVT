@@ -1,10 +1,10 @@
-name = "oyjh0381/moonmvt"
+name = "yyyt0807/moonmvt"
 
 version = "0.1.0"
 
 readme = "README.mbt.md"
 
-repository = "https://github.com/oyjh0381/MoonMVT"
+repository = "https://github.com/yyyt0807/MoonMVT"
 
 license = "Apache-2.0"
 

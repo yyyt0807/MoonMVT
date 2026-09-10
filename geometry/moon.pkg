@@ -1,5 +1,5 @@
 import {
-  "oyjh0381/moonmvt/error",
-  "oyjh0381/moonmvt/model",
-  "oyjh0381/moonmvt/wire",
+  "yyyt0807/moonmvt/error",
+  "yyyt0807/moonmvt/model",
+  "yyyt0807/moonmvt/wire",
 }
