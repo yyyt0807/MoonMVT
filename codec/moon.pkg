@@ -1,6 +1,7 @@
 import {
   "oyjh0381/moonmvt/error",
   "oyjh0381/moonmvt/geometry",
+  "oyjh0381/moonmvt/limits",
   "oyjh0381/moonmvt/model",
   "oyjh0381/moonmvt/wire",
 }
