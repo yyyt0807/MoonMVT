@@ -90,3 +90,9 @@ test "reader enforces top-level tile size" {
   ignore(Reader::new(b"abc", limits=tiny)) catch { _ => rejected = true }
   assert_true(rejected)
 }
+
+///|
+test "packed words preserve the full uint32 range" {
+  let reader = Reader::new(b"\x06\x00\xff\xff\xff\xff\x0f")
+  assert_eq(reader.read_packed_words("geometry", 2), [0U, 0xffffffffU])
+}

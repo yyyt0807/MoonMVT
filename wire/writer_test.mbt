@@ -90,3 +90,12 @@ test "writer and reader agree on mixed document" {
   assert_true(reader.is_done())
 }
 
+///|
+test "packed word writer preserves unsigned high values" {
+  let writer = Writer::new()
+  writer.write_packed_words(4, [0U, 0xffffffffU])
+  let reader = Reader::new(writer.finish())
+  let key = reader.read_key()
+  assert_eq(key, { number: 4, wire_type: WireType::LengthDelimited })
+  assert_eq(reader.read_packed_words("geometry", 2), [0U, 0xffffffffU])
+}

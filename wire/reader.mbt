@@ -281,3 +281,30 @@ pub fn Reader::read_packed_uint32(
   values
 }
 
+///|
+/// Decode packed uint32 words without losing the upper half of the UInt range.
+/// MVT geometry parameters use all 32 bits, so this is distinct from the
+/// dictionary-index helper above.
+pub fn Reader::read_packed_words(
+  self : Reader,
+  path : String,
+  maximum_words : Int,
+) -> Array[UInt] raise @error.MvtError {
+  let packed = self.read_subreader(path)
+  let values : Array[UInt] = []
+  while !packed.is_done() {
+    if values.length() >= maximum_words {
+      raise @error.MvtError::ResourceLimit(
+        limit=path,
+        actual=(values.length() + 1).to_int64(),
+        maximum=maximum_words.to_int64(),
+      )
+    }
+    let value = packed.read_varint(path)
+    if value > 0xffffffffUL {
+      raise @error.MvtError::NumericOverflow(path=path)
+    }
+    values.push(value.to_uint())
+  }
+  values
+}

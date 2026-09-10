@@ -123,7 +123,7 @@ pub(all) struct Feature {
   id : UInt64?
   tags : Array[Int]
   geometry_type : GeomType
-  geometry : Array[Int]
+  geometry : Array[UInt]
 } derive(Debug, Eq)
 
 ///|

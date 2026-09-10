@@ -142,6 +142,23 @@ pub fn Writer::write_packed_uint32(
 }
 
 ///|
+/// Write packed uint32 words including values above signed Int maximum.
+pub fn Writer::write_packed_words(
+  self : Writer,
+  number : Int,
+  values : ArrayView[UInt],
+) -> Unit raise @error.MvtError {
+  if values.is_empty() {
+    return
+  }
+  let packed = Writer::new()
+  for value in values {
+    packed.write_raw_varint(value.to_uint64())
+  }
+  self.write_message_field(number, packed)
+}
+
+///|
 pub fn Writer::write_repeated_message(
   self : Writer,
   number : Int,
