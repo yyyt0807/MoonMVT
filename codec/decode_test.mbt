@@ -13,6 +13,25 @@ test "decoder accepts an empty tile" {
 }
 
 ///|
+test "decoder accepts a mapbox-vector-tile 2.2.0 fixture" {
+  let bytes = b"\x1a\x37\x0a\x07interop\x12\x0f\x08\x2a\x12\x04\x00\x00\x01\x01\x18\x01\x22\x03\x09\x0e\x16\x1a\x04name\x1a\x02ok\x22\x08\x0a\x06python\x22\x02\x38\x01\x28\x80\x20\x78\x02"
+  let tile = decode_tile(bytes)
+  let layer = tile.layers[0]
+  let feature = layer.features[0]
+  assert_eq(layer.name, "interop")
+  assert_eq(layer.extent, 4096)
+  assert_eq(feature.id, Some(42UL))
+  assert_eq(layer.resolve_properties(feature), [
+    { key: "name", value: @model.MvtValue::StringValue("python"), },
+    { key: "ok", value: @model.MvtValue::BoolValue(true), },
+  ])
+  assert_eq(
+    @geometry.decode_geometry(feature.geometry_type, feature.geometry).paths[0].points,
+    [@model.Point::new(7, 11)],
+  )
+}
+
+///|
 test "decoder skips unknown fields at every message level" {
   let value = @wire.Writer::new()
   value.write_string_field(1, "road")

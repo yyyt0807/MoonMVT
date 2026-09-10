@@ -43,15 +43,12 @@ stored in the typed model and therefore disappear after re-encoding. This is why
 
 ## Interoperability verification
 
-Before release, interoperability should be checked with at least one independent
-MVT 2.1 implementation:
+On 2026-09-10, Python `mapbox-vector-tile` 2.2.0 decoded MoonMVT's fixed point
+golden vector as layer `x`, feature ID `1`, extent `4096`, and point `(1, 2)`.
+The same independent implementation generated a point tile with typed string
+and boolean properties; that 55-byte document is retained as a MoonMVT decoder
+regression fixture. Its provenance and MIT license are recorded in
+`THIRD_PARTY_NOTICES.md`.
 
-1. Generate a fixture externally from the public `vector_tile.proto`.
-2. Decode it with MoonMVT and compare every model field.
-3. Encode the same logical fixture with MoonMVT.
-4. Decode MoonMVT bytes externally and compare logical content.
-5. Record the external tool version and fixture license.
-
-No third-party binary fixture is committed until its redistribution terms are
-recorded in `THIRD_PARTY_NOTICES.md`.
-
+Before each release, repeat both directions with the release candidate. Self
+round trips remain necessary but are not sufficient interoperability evidence.

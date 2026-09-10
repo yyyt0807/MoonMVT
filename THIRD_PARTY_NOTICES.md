@@ -25,3 +25,15 @@ networks, personal location traces, or restricted geographic datasets.
 Before adding an external `.mvt` or `.pbf` fixture, contributors must record its
 origin, version, license, and redistribution permission in this file.
 
+## Interoperability fixture generator
+
+- Project: `mapbox-vector-tile`
+- URL: <https://github.com/tilezen/mapbox-vector-tile>
+- Version used: 2.2.0
+- License: MIT
+- Referenced scope: one 55-byte tile generated from an original, minimal point
+  feature on 2026-09-10 and stored inline in `codec/decode_test.mbt`.
+
+No source code, documentation text, geographic data, or bundled fixture from the
+Python project is copied. The generated tile contains only the synthetic names
+`interop`, `name`, `ok`, and `python`, plus the coordinate `(7, 11)`.
