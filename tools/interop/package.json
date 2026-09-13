@@ -1,0 +1,12 @@
+{
+  "name": "moonmvt-interop-check",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node run-js.mjs"
+  },
+  "dependencies": {
+    "@mapbox/vector-tile": "3.0.0",
+    "pbf": "5.1.2"
+  }
+}

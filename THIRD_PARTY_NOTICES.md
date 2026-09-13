@@ -37,3 +37,20 @@ origin, version, license, and redistribution permission in this file.
 No source code, documentation text, geographic data, or bundled fixture from the
 Python project is copied. The generated tile contains only the synthetic names
 `interop`, `name`, `ok`, and `python`, plus the coordinate `(7, 11)`.
+
+The release-only script in `tools/interop` also uses this package to generate
+six synthetic inputs and independently decode six MoonMVT outputs. The package
+is not a runtime dependency of MoonMVT.
+
+## JavaScript interoperability decoder
+
+- Project: `@mapbox/vector-tile`
+- URL: <https://github.com/mapbox/vector-tile-js>
+- Version used: 3.0.0
+- License: BSD-3-Clause
+- PBF reader: `pbf` 5.1.2, BSD-3-Clause
+- Referenced scope: release-only decoding of six synthetic MoonMVT outputs.
+
+No JavaScript implementation source or external map data is copied into
+MoonMVT. Both packages are development-only dependencies pinned under
+`tools/interop` and are not part of the published MoonBit module runtime.

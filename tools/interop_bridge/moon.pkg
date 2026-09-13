@@ -1,0 +1,10 @@
+import {
+  "moonbitlang/core/encoding/hex",
+  "moonbitlang/core/env",
+  "yyyt0807/moonmvt/builder",
+  "yyyt0807/moonmvt/codec",
+  "yyyt0807/moonmvt/geometry",
+  "yyyt0807/moonmvt/model",
+}
+
+pkgtype(kind: "executable")

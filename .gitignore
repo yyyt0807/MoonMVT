@@ -1,8 +1,8 @@
 _build/
 .mooncakes/
 .scratch/
+tools/interop/node_modules/
 *.mbti
 *.mbti.json
 *.core
 MoonMVT项目申报书.md
-
