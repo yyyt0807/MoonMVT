@@ -1,0 +1,8 @@
+import {
+  "moonbitlang/core/env",
+  "yyyt0807/moonmvt/builder",
+  "yyyt0807/moonmvt/codec",
+  "yyyt0807/moonmvt/model",
+}
+
+pkgtype(kind: "executable")
