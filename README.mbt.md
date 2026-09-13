@@ -8,7 +8,7 @@ outside the module boundary.
 Install the published module with:
 
 ```text
-moon add yyyt0807/moonmvt@0.1.0
+moon add yyyt0807/moonmvt@0.1.1
 ```
 
 The following executable documentation builds, encodes, decodes, and queries a
@@ -34,4 +34,5 @@ test "README typed tile workflow" {
 ```
 
 See the repository `README.md` for geometry conventions, resource limits,
-filtering, package architecture, security policy, and explicit non-goals.
+filtering, package architecture, security policy, independent interoperability,
+quantitative acceptance thresholds, and explicit non-goals.
