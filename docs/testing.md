@@ -21,6 +21,11 @@ moon check --target all --deny-warn
 moon test --target all --deny-warn
 moon run examples/build_tile
 moon run examples/filter_tile
+python -m pip install -r tools/interop/requirements.txt
+python tools/interop/run.py
+npm ci --prefix tools/interop
+npm run --prefix tools/interop check
+moon run --release --target native benchmarks/codec_bench
 ```
 
-For a release candidate, also generate interfaces with `moon info --target all`, confirm the working tree remains clean, then inspect one produced tile using an independent MVT implementation. Independent interoperability is a release gate, not evidence inferred from MoonMVT decoding its own output.
+For a release candidate, also generate interfaces with `moon info --target all` and confirm the working tree remains clean. The independent release gate requires 18/18 runtime-generated vectors and 106/106 semantic assertions, plus the documented fixed-workload performance floor. Independent interoperability is not inferred from MoonMVT decoding its own output.

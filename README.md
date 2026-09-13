@@ -20,7 +20,7 @@ MoonMVT 是纯 MoonBit 实现的 Mapbox Vector Tile 2.1 双向编解码与构建
 
 ## 安装与验证
 
-发布后可使用 `moon add yyyt0807/moonmvt@0.1.0`。本地仓库执行：
+发布后可使用 `moon add yyyt0807/moonmvt@0.1.1`。本地仓库执行：
 
 ```text
 moon check --target all --deny-warn
@@ -28,6 +28,12 @@ moon test --target all --deny-warn
 moon run examples/build_tile
 moon run examples/filter_tile
 ```
+
+## 行业对标与量化验收
+
+MoonMVT 采用三条独立互操作通道：MoonMVT → Python `mapbox-vector-tile 2.2.0`、Python → MoonMVT，以及 MoonMVT → Mapbox `@mapbox/vector-tile 3.0.0`。测试覆盖 6 类数据、18 个运行时生成向量和 106 个语义断言，发布门槛为 18/18（100%）通过。CI 还对固定 1,000 要素负载执行 100 次编码和解码，要求确定性 100/100、编码结果不超过 25,000 字节、Native release 编解码吞吐均不低于 10,000 要素/秒。
+
+复现方法、逐项失败条件、能力边界和实测基线见[互操作与量化验收](docs/interoperability.md)及[性能基线](docs/benchmarks.md)。这些指标衡量格式语义和 MoonMVT 自身回归，不把不同运行时的耗时直接包装成跨语言速度排名。
 
 ## 构建瓦片
 
@@ -105,7 +111,7 @@ let eastern = @query.filter_intersects(
 | `builder` | 类型化要素构建与属性字典管理 |
 | `query` | 读取、统计、筛选和安全重建 |
 
-更多信息见 [架构](docs/architecture.md)、[规范符合性](docs/conformance.md)、[安全模型](docs/security.md)、[测试策略](docs/testing.md) 和 [生态查重](docs/ecosystem-comparison.md)。
+更多信息见 [架构](docs/architecture.md)、[规范符合性](docs/conformance.md)、[互操作与量化验收](docs/interoperability.md)、[性能基线](docs/benchmarks.md)、[安全模型](docs/security.md)、[测试策略](docs/testing.md) 和 [生态查重](docs/ecosystem-comparison.md)。
 
 ## 功能边界
 
