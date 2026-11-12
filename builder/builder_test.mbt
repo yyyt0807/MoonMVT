@@ -1,17 +1,17 @@
 ///|
 test "layer builder interns keys and typed values by first appearance" {
-  let builder = LayerBuilder::new("places")
+  let builder = @builder.LayerBuilder::new("places")
   builder.add_points(
     [@model.Point::new(1, 2)],
     properties=[
-      property("name", @model.MvtValue::StringValue("Harbor")),
-      property("capital", @model.MvtValue::BoolValue(true)),
+      @builder.property("name", @model.MvtValue::StringValue("Harbor")),
+      @builder.property("capital", @model.MvtValue::BoolValue(true)),
     ],
     id=Some(1UL),
   )
   builder.add_points([@model.Point::new(3, 4)], properties=[
-    property("name", @model.MvtValue::StringValue("Harbor")),
-    property("population", @model.MvtValue::UIntValue(12UL)),
+    @builder.property("name", @model.MvtValue::StringValue("Harbor")),
+    @builder.property("population", @model.MvtValue::UIntValue(12UL)),
   ])
   let layer = builder.finish()
   assert_eq(layer.keys, ["name", "capital", "population"])
@@ -26,7 +26,7 @@ test "layer builder interns keys and typed values by first appearance" {
 
 ///|
 test "finish returns a snapshot independent of later additions" {
-  let builder = LayerBuilder::new("places")
+  let builder = @builder.LayerBuilder::new("places")
   builder.add_points([@model.Point::new(1, 1)])
   let first = builder.finish()
   builder.add_points([@model.Point::new(2, 2)])
@@ -37,7 +37,7 @@ test "finish returns a snapshot independent of later additions" {
 
 ///|
 test "builder constructs point line and polygon geometries" {
-  let builder = LayerBuilder::new("mixed")
+  let builder = @builder.LayerBuilder::new("mixed")
   builder.add_points([@model.Point::new(1, 1)])
   builder.add_lines([[@model.Point::new(0, 0), @model.Point::new(4, 4)]])
   builder.add_polygons([
@@ -57,11 +57,11 @@ test "builder constructs point line and polygon geometries" {
 
 ///|
 test "builder rejects duplicate property names within one feature" {
-  let builder = LayerBuilder::new("x")
+  let builder = @builder.LayerBuilder::new("x")
   let mut rejected = false
   builder.add_points([@model.Point::new(0, 0)], properties=[
-    property("name", @model.MvtValue::StringValue("a")),
-    property("name", @model.MvtValue::StringValue("b")),
+    @builder.property("name", @model.MvtValue::StringValue("a")),
+    @builder.property("name", @model.MvtValue::StringValue("b")),
   ]) catch {
     _ => rejected = true
   }
@@ -71,10 +71,12 @@ test "builder rejects duplicate property names within one feature" {
 
 ///|
 test "failed feature addition does not partially intern dictionaries" {
-  let builder = LayerBuilder::new("x")
-  let invalid = FeatureInput::raw(@model.GeomType::LineString, [9U, 0U, 0U], properties=[
-    property("name", @model.MvtValue::StringValue("bad")),
-  ])
+  let builder = @builder.LayerBuilder::new("x")
+  let invalid = @builder.FeatureInput::raw(
+    @model.GeomType::LineString,
+    [9U, 0U, 0U],
+    properties=[@builder.property("name", @model.MvtValue::StringValue("bad"))],
+  )
   let mut rejected = false
   builder.add_feature(invalid) catch {
     _ => rejected = true
@@ -86,10 +88,10 @@ test "failed feature addition does not partially intern dictionaries" {
 
 ///|
 test "tile builder rejects duplicate layer names" {
-  let tile = TileBuilder::new()
-  tile.add_built_layer(LayerBuilder::new("roads"))
+  let tile = @builder.TileBuilder::new()
+  tile.add_built_layer(@builder.LayerBuilder::new("roads"))
   let mut rejected = false
-  tile.add_built_layer(LayerBuilder::new("roads")) catch {
+  tile.add_built_layer(@builder.LayerBuilder::new("roads")) catch {
     _ => rejected = true
   }
   assert_true(rejected)
@@ -116,7 +118,7 @@ test "compact layer removes unused and duplicate dictionary entries" {
     extent: 4096,
     version: 2,
   }
-  let compacted = compact_layer(layer)
+  let compacted = @builder.compact_layer(layer)
   assert_eq(compacted.keys, ["name"])
   assert_eq(compacted.values, [@model.MvtValue::StringValue("Harbor")])
   assert_eq(compacted.features[0].tags, [0, 0, 0, 0])
@@ -124,7 +126,7 @@ test "compact layer removes unused and duplicate dictionary entries" {
 
 ///|
 test "float dictionary interning preserves distinct NaN payloads" {
-  let builder = LayerBuilder::new("values")
+  let builder = @builder.LayerBuilder::new("values")
   let a = Float::reinterpret_from_uint(0x7fc00001U)
   let b = Float::reinterpret_from_uint(0x7fc00002U)
   assert_eq(builder.intern_value(@model.MvtValue::FloatValue(a)), 0)

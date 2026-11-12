@@ -28,7 +28,7 @@ fn ensure(condition : Bool, message : String) -> Unit {
 }
 
 ///|
-fn point(x : Int, y : Int) -> @model.Point {
+fn point(x : Int32, y : Int32) -> @model.Point {
   @model.Point::new(x, y)
 }
 

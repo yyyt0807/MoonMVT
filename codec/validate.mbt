@@ -18,7 +18,7 @@ pub fn validate_tile(tile : @model.Tile) -> Unit raise @error.MvtError {
 ///|
 pub fn validate_layer(
   layer : @model.Layer,
-  path? : String = "layer",
+  path~ : String = "layer",
 ) -> Unit raise @error.MvtError {
   if layer.name == "" {
     raise @error.MvtError::InvalidTile(
@@ -51,7 +51,7 @@ pub fn validate_layer(
 pub fn validate_feature(
   layer : @model.Layer,
   feature : @model.Feature,
-  path? : String = "feature",
+  path~ : String = "feature",
 ) -> Unit raise @error.MvtError {
   if feature.tags.length() % 2 != 0 {
     raise @error.MvtError::InvalidTile(

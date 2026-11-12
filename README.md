@@ -6,6 +6,8 @@ MoonMVT 是纯 MoonBit 实现的 Mapbox Vector Tile 2.1 双向编解码与构建
 
 项目核心处理“瓦片局部整数坐标”。经纬度投影、Web Mercator 瓦片选择、地图下载、渲染和样式均不属于本项目，以避免把格式库变成职责混杂的 GIS 平台。
 
+维护验证使用官方 MoonBit 工具链，`moon` 版本为 `0.1.20261104`，编译器版本为 `v0.10.20+65efd5b93`。源码构建及 CI 请使用此版本或兼容的更新版本。
+
 ## 主要能力
 
 - MVT 2.1 `Tile`、`Layer`、`Feature`、`Value` 完整类型模型；

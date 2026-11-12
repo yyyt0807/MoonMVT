@@ -2,7 +2,7 @@
 /// Decode and structurally validate a complete MVT document.
 pub fn decode_tile(
   data : Bytes,
-  limits? : @limits.DecodeLimits = @limits.DecodeLimits::standard(),
+  limits~ : @limits.DecodeLimits = @limits.DecodeLimits::standard(),
 ) -> @model.Tile raise @error.MvtError {
   let reader = @wire.Reader::new(data, limits~)
   let layers : Array[@model.Layer] = []
@@ -30,7 +30,7 @@ pub fn decode_tile(
 ///|
 fn decode_layer(
   reader : @wire.Reader,
-  layer_index : Int,
+  layer_index : Int32,
   limits : @limits.DecodeLimits,
 ) -> @model.Layer raise @error.MvtError {
   let path = "layers[\{layer_index}]"
@@ -38,8 +38,8 @@ fn decode_layer(
   let features : Array[@model.Feature] = []
   let keys : Array[String] = []
   let values : Array[@model.MvtValue] = []
-  let mut extent : Int? = None
-  let mut version : Int? = None
+  let mut extent : Int32? = None
+  let mut version : Int32? = None
   while !reader.is_done() {
     let key = reader.read_key()
     match key.number {
@@ -128,9 +128,9 @@ fn decode_feature(
   limits : @limits.DecodeLimits,
 ) -> @model.Feature raise @error.MvtError {
   let mut id : UInt64? = None
-  let tags : Array[Int] = []
+  let tags : Array[Int32] = []
   let mut geometry_type : @model.GeomType? = None
-  let geometry : Array[UInt] = []
+  let geometry : Array[UInt32] = []
   while !reader.is_done() {
     let key = reader.read_key()
     match key.number {
@@ -278,7 +278,7 @@ fn decode_value(
 fn read_nonnegative_int(
   reader : @wire.Reader,
   path : String,
-) -> Int raise @error.MvtError {
+) -> Int32 raise @error.MvtError {
   let raw = reader.read_varint(path)
   if raw > 2147483647UL {
     raise @error.MvtError::NumericOverflow(path~)
@@ -290,7 +290,7 @@ fn read_nonnegative_int(
 fn read_positive_int(
   reader : @wire.Reader,
   path : String,
-) -> Int raise @error.MvtError {
+) -> Int32 raise @error.MvtError {
   let value = read_nonnegative_int(reader, path)
   if value == 0 {
     raise @error.MvtError::InvalidTile(path~, detail="value must be positive")

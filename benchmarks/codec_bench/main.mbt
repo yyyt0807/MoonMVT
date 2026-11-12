@@ -1,14 +1,14 @@
 ///|
-const FEATURE_COUNT : Int = 1000
+const FEATURE_COUNT : Int32 = 1000
 
 ///|
-const ITERATIONS : Int = 100
+const ITERATIONS : Int32 = 100
 
 ///|
 const MIN_FEATURES_PER_SECOND : UInt64 = 10000UL
 
 ///|
-const MAX_FIXTURE_BYTES : Int = 25000
+const MAX_FIXTURE_BYTES : Int32 = 25000
 
 ///|
 fn main {

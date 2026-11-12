@@ -1,3 +1,4 @@
 import {
+  "moonbitlang/core/debug",
   "yyyt0807/moonmvt/error",
 }

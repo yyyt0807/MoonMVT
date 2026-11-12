@@ -49,15 +49,15 @@ fn fixture_tile() -> @model.Tile raise {
 ///|
 test "encoding is deterministic for the same model" {
   let tile = fixture_tile()
-  let first = encode_tile(tile)
-  let second = encode_tile(tile)
+  let first = @codec.encode_tile(tile)
+  let second = @codec.encode_tile(tile)
   assert_eq(first, second)
   assert_true(first.length() > 0)
 }
 
 ///|
 test "empty tile encodes as an empty protobuf document" {
-  assert_eq(encode_tile(@model.Tile::empty()), b"")
+  assert_eq(@codec.encode_tile(@model.Tile::empty()), b"")
 }
 
 ///|
@@ -82,7 +82,7 @@ test "simple point tile has stable golden bytes" {
     ],
   }
   assert_eq(
-    encode_tile(tile),
+    @codec.encode_tile(tile),
     b"\x1a\x13\x0a\x01x\x12\x09\x08\x01\x18\x01\x22\x03\x09\x02\x04\x28\x80\x20\x78\x02",
   )
 }
@@ -102,7 +102,7 @@ test "all value variants encode one schema field" {
     let tile : @model.Tile = {
       layers: [{ ..@model.Layer::empty("values"), values: [value], }],
     }
-    assert_true(encode_tile(tile).length() > 0)
+    assert_true(@codec.encode_tile(tile).length() > 0)
   }
 }
 
@@ -110,13 +110,13 @@ test "all value variants encode one schema field" {
 test "validation rejects duplicate and empty layer names" {
   let empty = @model.Layer::empty("")
   let mut empty_rejected = false
-  ignore(encode_tile({ layers: [empty], })) catch {
+  ignore(@codec.encode_tile({ layers: [empty], })) catch {
     _ => empty_rejected = true
   }
   assert_true(empty_rejected)
   let repeated = @model.Layer::empty("roads")
   let mut duplicate_rejected = false
-  ignore(encode_tile({ layers: [repeated, repeated], })) catch {
+  ignore(@codec.encode_tile({ layers: [repeated, repeated], })) catch {
     _ => duplicate_rejected = true
   }
   assert_true(duplicate_rejected)
@@ -128,7 +128,7 @@ test "validation rejects unsupported version and extent" {
   let invalid = [{ ..base, version: 1, }, { ..base, extent: 0, }]
   for layer in invalid {
     let mut rejected = false
-    ignore(encode_tile({ layers: [layer], })) catch {
+    ignore(@codec.encode_tile({ layers: [layer], })) catch {
       _ => rejected = true
     }
     assert_true(rejected)
@@ -146,7 +146,7 @@ test "validation rejects bad property references" {
     features: [feature],
   }
   let mut rejected = false
-  ignore(encode_tile({ layers: [layer], })) catch {
+  ignore(@codec.encode_tile({ layers: [layer], })) catch {
     _ => rejected = true
   }
   assert_true(rejected)
@@ -165,7 +165,7 @@ test "validation rejects malformed geometry before writing bytes" {
     features: [feature],
   }
   let mut rejected = false
-  ignore(encode_tile({ layers: [layer], })) catch {
+  ignore(@codec.encode_tile({ layers: [layer], })) catch {
     _ => rejected = true
   }
   assert_true(rejected)

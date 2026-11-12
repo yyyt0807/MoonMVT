@@ -3,8 +3,8 @@
 /// grammar for the declared geometry type.
 pub fn decode_geometry(
   geometry_type : @model.GeomType,
-  words : ArrayView[UInt],
-  path? : String = "geometry",
+  words : ArrayView[UInt32],
+  path~ : String = "geometry",
 ) -> DecodedGeometry raise @error.MvtError {
   match geometry_type {
     Unknown => {
@@ -25,15 +25,15 @@ pub fn decode_geometry(
 ///|
 pub fn validate_geometry(
   geometry_type : @model.GeomType,
-  words : ArrayView[UInt],
-  path? : String = "geometry",
+  words : ArrayView[UInt32],
+  path~ : String = "geometry",
 ) -> Unit raise @error.MvtError {
   ignore(decode_geometry(geometry_type, words, path~))
 }
 
 ///|
 fn decode_point_geometry(
-  words : ArrayView[UInt],
+  words : ArrayView[UInt32],
   path : String,
 ) -> DecodedGeometry raise @error.MvtError {
   if words.is_empty() {
@@ -71,7 +71,7 @@ fn decode_point_geometry(
 
 ///|
 fn decode_line_geometry(
-  words : ArrayView[UInt],
+  words : ArrayView[UInt32],
   path : String,
 ) -> DecodedGeometry raise @error.MvtError {
   if words.is_empty() {
@@ -131,7 +131,7 @@ fn decode_line_geometry(
 
 ///|
 fn decode_polygon_geometry(
-  words : ArrayView[UInt],
+  words : ArrayView[UInt32],
   path : String,
 ) -> DecodedGeometry raise @error.MvtError {
   if words.is_empty() {
@@ -214,11 +214,11 @@ priv struct DecodeCursor {
 
 ///|
 fn decode_point(
-  words : ArrayView[UInt],
-  index : Int,
+  words : ArrayView[UInt32],
+  index : Int32,
   cursor : DecodeCursor,
   path : String,
-) -> (@model.Point, Int) raise @error.MvtError {
+) -> (@model.Point, Int32) raise @error.MvtError {
   if index < 0 || index + 1 >= words.length() {
     raise @error.MvtError::InvalidGeometry(
       path~,
@@ -242,10 +242,10 @@ fn decode_point(
 
 ///|
 fn checked_parameter_end(
-  start : Int,
-  point_count : Int,
+  start : Int32,
+  point_count : Int32,
   path : String,
-) -> Int raise @error.MvtError {
+) -> Int32 raise @error.MvtError {
   if point_count > (2147483647 - start) / 2 {
     raise @error.MvtError::ResourceLimit(
       limit=path + ".parameters",
@@ -259,7 +259,7 @@ fn checked_parameter_end(
 ///|
 fn unexpected_command(
   path : String,
-  index : Int,
+  index : Int32,
   expected : String,
   actual : CommandId,
 ) -> @error.MvtError {

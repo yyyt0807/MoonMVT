@@ -1,5 +1,6 @@
 ///|
 /// Typed value variants defined by `vector_tile.proto`.
+#derive(Debug, Eq)
 pub(all) enum MvtValue {
   StringValue(String)
   FloatValue(Float)
@@ -8,10 +9,11 @@ pub(all) enum MvtValue {
   UIntValue(UInt64)
   SIntValue(Int64)
   BoolValue(Bool)
-} derive(Debug, Eq)
+}
 
 ///|
 /// Stable value kind used by diagnostics and applications.
+#derive(Debug, Eq)
 pub(all) enum ValueKind {
   String
   Float
@@ -20,7 +22,7 @@ pub(all) enum ValueKind {
   UInt
   SInt
   Bool
-} derive(Debug, Eq)
+}
 
 ///|
 pub fn MvtValue::kind(self : MvtValue) -> ValueKind {
@@ -130,3 +132,15 @@ pub fn MvtValue::is_finite(self : MvtValue) -> Bool {
     _ => true
   }
 }
+
+///|
+pub extend MvtValue with @moonbitlang/core/debug.Debug::{to_repr}
+
+///|
+pub extend MvtValue with Eq::{not_equal, equal}
+
+///|
+pub extend ValueKind with @moonbitlang/core/debug.Debug::{to_repr}
+
+///|
+pub extend ValueKind with Eq::{not_equal, equal}

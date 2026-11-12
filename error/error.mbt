@@ -1,16 +1,17 @@
 ///|
 /// Stable error categories returned by MoonMVT.
+#derive(Debug, Eq)
 pub(all) suberror MvtError {
   InvalidArgument(String)
-  TruncatedInput(offset~ : Int, context~ : String)
-  InvalidWire(offset~ : Int, detail~ : String)
+  TruncatedInput(offset~ : Int32, context~ : String)
+  InvalidWire(offset~ : Int32, detail~ : String)
   InvalidTile(path~ : String, detail~ : String)
   InvalidGeometry(path~ : String, detail~ : String)
   InvalidUtf8(path~ : String)
   NumericOverflow(path~ : String)
   ResourceLimit(limit~ : String, actual~ : Int64, maximum~ : Int64)
   Unsupported(path~ : String, detail~ : String)
-} derive(Debug, Eq)
+}
 
 ///|
 /// Stable machine-readable code for integrations and tests.
@@ -70,3 +71,9 @@ pub fn MvtError::is_malformed_input(self : MvtError) -> Bool {
     _ => false
   }
 }
+
+///|
+pub extend MvtError with @moonbitlang/core/debug.Debug::{to_repr}
+
+///|
+pub extend MvtError with Eq::{not_equal, equal}

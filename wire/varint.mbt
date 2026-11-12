@@ -1,6 +1,6 @@
 ///|
 /// Maximum number of bytes in one protobuf UInt64 varint.
-pub let max_varint_bytes : Int = 10
+pub let max_varint_bytes : Int32 = 10
 
 ///|
 /// Encode an unsigned protobuf varint using its shortest representation.
@@ -26,8 +26,8 @@ pub fn append_varint(output : Array[Byte], initial : UInt64) -> Unit {
 /// Overlong and overflowing encodings are rejected.
 pub fn decode_varint(
   data : Bytes,
-  offset : Int,
-) -> (UInt64, Int) raise @error.MvtError {
+  offset : Int32,
+) -> (UInt64, Int32) raise @error.MvtError {
   if offset < 0 || offset > data.length() {
     raise @error.MvtError::InvalidArgument("varint offset is outside input")
   }
@@ -65,7 +65,7 @@ pub fn decode_varint(
 
 ///|
 /// Number of bytes in the canonical varint representation.
-pub fn varint_length(initial : UInt64) -> Int {
+pub fn varint_length(initial : UInt64) -> Int32 {
   let mut value = initial
   let mut length = 1
   while value >= 0x80UL {
@@ -96,7 +96,7 @@ pub fn zigzag_decode_i64(value : UInt64) -> Int64 {
 }
 
 ///|
-pub fn zigzag_encode_i32(value : Int) -> UInt {
+pub fn zigzag_encode_i32(value : Int32) -> UInt32 {
   if value >= 0 {
     value.reinterpret_as_uint() * 2U
   } else {
@@ -105,7 +105,7 @@ pub fn zigzag_encode_i32(value : Int) -> UInt {
 }
 
 ///|
-pub fn zigzag_decode_i32(value : UInt) -> Int {
+pub fn zigzag_decode_i32(value : UInt32) -> Int32 {
   if (value & 1U) == 0U {
     (value >> 1).reinterpret_as_int()
   } else {
@@ -116,7 +116,7 @@ pub fn zigzag_decode_i32(value : UInt) -> Int {
 ///|
 /// Construct a protobuf field key.
 pub fn encode_field_key(
-  number : Int,
+  number : Int32,
   wire_type : WireType,
 ) -> UInt64 raise @error.MvtError {
   if number <= 0 || number > 536870911 {
@@ -131,7 +131,7 @@ pub fn encode_field_key(
 /// Split a raw protobuf field key into its validated number and wire type.
 pub fn decode_field_key(
   raw : UInt64,
-  offset : Int,
+  offset : Int32,
 ) -> FieldKey raise @error.MvtError {
   let number64 = raw >> 3
   if number64 == 0UL || number64 > 536870911UL {

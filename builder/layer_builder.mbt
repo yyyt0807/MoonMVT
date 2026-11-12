@@ -14,7 +14,7 @@ fn LayerBuilder::add_feature_interned(
   self : LayerBuilder,
   input : FeatureInput,
 ) -> Unit {
-  let tags : Array[Int] = []
+  let tags : Array[Int32] = []
   for item in input.properties {
     tags.push(self.intern_key(item.key))
     tags.push(self.intern_value(item.value))
@@ -31,8 +31,8 @@ fn LayerBuilder::add_feature_interned(
 pub fn LayerBuilder::add_points(
   self : LayerBuilder,
   points : Array[@model.Point],
-  properties? : Array[@model.Property] = [],
-  id? : UInt64? = None,
+  properties~ : Array[@model.Property] = [],
+  id~ : UInt64? = None,
 ) -> Unit raise @error.MvtError {
   self.add_feature(FeatureInput::points(points, properties~, id~))
 }
@@ -41,8 +41,8 @@ pub fn LayerBuilder::add_points(
 pub fn LayerBuilder::add_lines(
   self : LayerBuilder,
   lines : Array[Array[@model.Point]],
-  properties? : Array[@model.Property] = [],
-  id? : UInt64? = None,
+  properties~ : Array[@model.Property] = [],
+  id~ : UInt64? = None,
 ) -> Unit raise @error.MvtError {
   self.add_feature(FeatureInput::lines(lines, properties~, id~))
 }
@@ -51,14 +51,14 @@ pub fn LayerBuilder::add_lines(
 pub fn LayerBuilder::add_polygons(
   self : LayerBuilder,
   rings : Array[Array[@model.Point]],
-  properties? : Array[@model.Property] = [],
-  id? : UInt64? = None,
+  properties~ : Array[@model.Property] = [],
+  id~ : UInt64? = None,
 ) -> Unit raise @error.MvtError {
   self.add_feature(FeatureInput::polygons(rings, properties~, id~))
 }
 
 ///|
-pub fn LayerBuilder::intern_key(self : LayerBuilder, key : String) -> Int {
+pub fn LayerBuilder::intern_key(self : LayerBuilder, key : String) -> Int32 {
   for index, existing in self.keys {
     if existing == key {
       return index
@@ -72,7 +72,7 @@ pub fn LayerBuilder::intern_key(self : LayerBuilder, key : String) -> Int {
 pub fn LayerBuilder::intern_value(
   self : LayerBuilder,
   value : @model.MvtValue,
-) -> Int {
+) -> Int32 {
   for index, existing in self.values {
     if existing.dictionary_equal(value) {
       return index

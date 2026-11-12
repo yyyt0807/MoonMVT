@@ -1,14 +1,15 @@
 ///|
 /// Geometry type values from the MVT schema.
+#derive(Debug, Eq)
 pub(all) enum GeomType {
   Unknown
   Point
   LineString
   Polygon
-} derive(Debug, Eq)
+}
 
 ///|
-pub fn GeomType::number(self : GeomType) -> Int {
+pub fn GeomType::number(self : GeomType) -> Int32 {
   match self {
     Unknown => 0
     Point => 1
@@ -29,7 +30,7 @@ pub fn GeomType::name(self : GeomType) -> String {
 
 ///|
 pub fn GeomType::from_number(
-  value : Int,
+  value : Int32,
   path : String,
 ) -> GeomType raise @error.MvtError {
   match value {
@@ -48,18 +49,19 @@ pub fn GeomType::from_number(
 ///|
 /// Tile-local integer coordinate. The y axis follows the MVT tile coordinate
 /// convention and typically increases downward.
+#derive(Debug, Eq)
 pub(all) struct Point {
-  x : Int
-  y : Int
-} derive(Debug, Eq)
+  x : Int32
+  y : Int32
+}
 
 ///|
-pub fn Point::new(x : Int, y : Int) -> Point {
+pub fn Point::new(x : Int32, y : Int32) -> Point {
   { x, y, }
 }
 
 ///|
-pub fn Point::translate(self : Point, dx : Int, dy : Int) -> Point {
+pub fn Point::translate(self : Point, dx : Int32, dy : Int32) -> Point {
   { x: self.x + dx, y: self.y + dy, }
 }
 
@@ -70,12 +72,13 @@ pub fn Point::manhattan_distance(self : Point, other : Point) -> Int64 {
 }
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct Bounds {
-  min_x : Int
-  min_y : Int
-  max_x : Int
-  max_y : Int
-} derive(Debug, Eq)
+  min_x : Int32
+  min_y : Int32
+  max_x : Int32
+  max_y : Int32
+}
 
 ///|
 pub fn Bounds::from_point(point : Point) -> Bounds {
@@ -128,19 +131,21 @@ pub fn Bounds::contains(self : Bounds, point : Point) -> Bool {
 
 ///|
 /// Resolved user-facing property. The encoded dictionary indexes are absent.
+#derive(Debug, Eq)
 pub(all) struct Property {
   key : String
   value : MvtValue
-} derive(Debug, Eq)
+}
 
 ///|
 /// MVT feature model. Tags contain alternating key and value dictionary indexes.
+#derive(Debug, Eq)
 pub(all) struct Feature {
   id : UInt64?
-  tags : Array[Int]
+  tags : Array[Int32]
   geometry_type : GeomType
-  geometry : Array[UInt]
-} derive(Debug, Eq)
+  geometry : Array[UInt32]
+}
 
 ///|
 pub fn Feature::empty(geometry_type : GeomType) -> Feature {
@@ -158,40 +163,42 @@ pub fn Feature::without_id(self : Feature) -> Feature {
 }
 
 ///|
-pub fn Feature::property_count(self : Feature) -> Int {
+pub fn Feature::property_count(self : Feature) -> Int32 {
   self.tags.length() / 2
 }
 
 ///|
 /// MVT layer model. Dictionary order and feature order are observable.
+#derive(Debug, Eq)
 pub(all) struct Layer {
   name : String
   features : Array[Feature]
   keys : Array[String]
   values : Array[MvtValue]
-  extent : Int
-  version : Int
-} derive(Debug, Eq)
+  extent : Int32
+  version : Int32
+}
 
 ///|
-pub fn Layer::empty(name : String, extent? : Int = 4096) -> Layer {
+pub fn Layer::empty(name : String, extent~ : Int32 = 4096) -> Layer {
   { name, features: [], keys: [], values: [], extent, version: 2, }
 }
 
 ///|
-pub fn Layer::feature_count(self : Layer) -> Int {
+pub fn Layer::feature_count(self : Layer) -> Int32 {
   self.features.length()
 }
 
 ///|
-pub fn Layer::property_dictionary_size(self : Layer) -> Int {
+pub fn Layer::property_dictionary_size(self : Layer) -> Int32 {
   self.keys.length() + self.values.length()
 }
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct Tile {
   layers : Array[Layer]
-} derive(Debug, Eq)
+}
 
 ///|
 pub fn Tile::empty() -> Tile {
@@ -199,20 +206,21 @@ pub fn Tile::empty() -> Tile {
 }
 
 ///|
-pub fn Tile::layer_count(self : Tile) -> Int {
+pub fn Tile::layer_count(self : Tile) -> Int32 {
   self.layers.length()
 }
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct TileSummary {
-  layers : Int
-  features : Int
-  points : Int
-  lines : Int
-  polygons : Int
-  unknown_geometries : Int
-  geometry_words : Int
-} derive(Debug, Eq)
+  layers : Int32
+  features : Int32
+  points : Int32
+  lines : Int32
+  polygons : Int32
+  unknown_geometries : Int32
+  geometry_words : Int32
+}
 
 ///|
 fn abs64(value : Int64) -> Int64 {
@@ -222,3 +230,51 @@ fn abs64(value : Int64) -> Int64 {
     value
   }
 }
+
+///|
+pub extend Bounds with @moonbitlang/core/debug.Debug::{to_repr}
+
+///|
+pub extend Bounds with Eq::{not_equal, equal}
+
+///|
+pub extend Feature with @moonbitlang/core/debug.Debug::{to_repr}
+
+///|
+pub extend Feature with Eq::{not_equal, equal}
+
+///|
+pub extend GeomType with @moonbitlang/core/debug.Debug::{to_repr}
+
+///|
+pub extend GeomType with Eq::{not_equal, equal}
+
+///|
+pub extend Layer with @moonbitlang/core/debug.Debug::{to_repr}
+
+///|
+pub extend Layer with Eq::{not_equal, equal}
+
+///|
+pub extend Point with @moonbitlang/core/debug.Debug::{to_repr}
+
+///|
+pub extend Point with Eq::{not_equal, equal}
+
+///|
+pub extend Property with @moonbitlang/core/debug.Debug::{to_repr}
+
+///|
+pub extend Property with Eq::{not_equal, equal}
+
+///|
+pub extend Tile with @moonbitlang/core/debug.Debug::{to_repr}
+
+///|
+pub extend Tile with Eq::{not_equal, equal}
+
+///|
+pub extend TileSummary with @moonbitlang/core/debug.Debug::{to_repr}
+
+///|
+pub extend TileSummary with Eq::{not_equal, equal}

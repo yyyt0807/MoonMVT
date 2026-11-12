@@ -1,17 +1,18 @@
 ///|
 /// Explicit resource ceilings for untrusted MVT input.
+#derive(Debug, Eq)
 pub(all) struct DecodeLimits {
-  max_tile_bytes : Int
-  max_layers : Int
-  max_features_per_layer : Int
-  max_keys_per_layer : Int
-  max_values_per_layer : Int
-  max_tags_per_feature : Int
-  max_geometry_words_per_feature : Int
-  max_string_bytes : Int
-  max_submessage_bytes : Int
-  max_unknown_fields : Int
-} derive(Debug, Eq)
+  max_tile_bytes : Int32
+  max_layers : Int32
+  max_features_per_layer : Int32
+  max_keys_per_layer : Int32
+  max_values_per_layer : Int32
+  max_tags_per_feature : Int32
+  max_geometry_words_per_feature : Int32
+  max_string_bytes : Int32
+  max_submessage_bytes : Int32
+  max_unknown_fields : Int32
+}
 
 ///|
 /// Conservative defaults suitable for network-delivered vector tiles.
@@ -75,7 +76,7 @@ pub fn DecodeLimits::validate(
 ///|
 pub fn DecodeLimits::check_tile_bytes(
   self : DecodeLimits,
-  actual : Int,
+  actual : Int32,
 ) -> Unit raise @error.MvtError {
   check_limit("tile_bytes", actual, self.max_tile_bytes)
 }
@@ -83,7 +84,7 @@ pub fn DecodeLimits::check_tile_bytes(
 ///|
 pub fn DecodeLimits::check_layers(
   self : DecodeLimits,
-  actual : Int,
+  actual : Int32,
 ) -> Unit raise @error.MvtError {
   check_limit("layers", actual, self.max_layers)
 }
@@ -91,7 +92,7 @@ pub fn DecodeLimits::check_layers(
 ///|
 pub fn DecodeLimits::check_features(
   self : DecodeLimits,
-  actual : Int,
+  actual : Int32,
 ) -> Unit raise @error.MvtError {
   check_limit("features_per_layer", actual, self.max_features_per_layer)
 }
@@ -99,7 +100,7 @@ pub fn DecodeLimits::check_features(
 ///|
 pub fn DecodeLimits::check_keys(
   self : DecodeLimits,
-  actual : Int,
+  actual : Int32,
 ) -> Unit raise @error.MvtError {
   check_limit("keys_per_layer", actual, self.max_keys_per_layer)
 }
@@ -107,7 +108,7 @@ pub fn DecodeLimits::check_keys(
 ///|
 pub fn DecodeLimits::check_values(
   self : DecodeLimits,
-  actual : Int,
+  actual : Int32,
 ) -> Unit raise @error.MvtError {
   check_limit("values_per_layer", actual, self.max_values_per_layer)
 }
@@ -115,7 +116,7 @@ pub fn DecodeLimits::check_values(
 ///|
 pub fn DecodeLimits::check_tags(
   self : DecodeLimits,
-  actual : Int,
+  actual : Int32,
 ) -> Unit raise @error.MvtError {
   check_limit("tags_per_feature", actual, self.max_tags_per_feature)
 }
@@ -123,7 +124,7 @@ pub fn DecodeLimits::check_tags(
 ///|
 pub fn DecodeLimits::check_geometry_words(
   self : DecodeLimits,
-  actual : Int,
+  actual : Int32,
 ) -> Unit raise @error.MvtError {
   check_limit(
     "geometry_words_per_feature",
@@ -135,7 +136,7 @@ pub fn DecodeLimits::check_geometry_words(
 ///|
 pub fn DecodeLimits::check_string_bytes(
   self : DecodeLimits,
-  actual : Int,
+  actual : Int32,
 ) -> Unit raise @error.MvtError {
   check_limit("string_bytes", actual, self.max_string_bytes)
 }
@@ -143,7 +144,7 @@ pub fn DecodeLimits::check_string_bytes(
 ///|
 pub fn DecodeLimits::check_submessage_bytes(
   self : DecodeLimits,
-  actual : Int,
+  actual : Int32,
 ) -> Unit raise @error.MvtError {
   check_limit("submessage_bytes", actual, self.max_submessage_bytes)
 }
@@ -151,13 +152,13 @@ pub fn DecodeLimits::check_submessage_bytes(
 ///|
 pub fn DecodeLimits::check_unknown_fields(
   self : DecodeLimits,
-  actual : Int,
+  actual : Int32,
 ) -> Unit raise @error.MvtError {
   check_limit("unknown_fields", actual, self.max_unknown_fields)
 }
 
 ///|
-fn check_positive(name : String, value : Int) -> Unit raise @error.MvtError {
+fn check_positive(name : String, value : Int32) -> Unit raise @error.MvtError {
   if value <= 0 {
     raise @error.MvtError::InvalidArgument(name + " must be positive")
   }
@@ -166,8 +167,8 @@ fn check_positive(name : String, value : Int) -> Unit raise @error.MvtError {
 ///|
 fn check_limit(
   name : String,
-  actual : Int,
-  maximum : Int,
+  actual : Int32,
+  maximum : Int32,
 ) -> Unit raise @error.MvtError {
   if actual < 0 {
     raise @error.MvtError::InvalidArgument(name + " count must not be negative")
@@ -180,3 +181,9 @@ fn check_limit(
     )
   }
 }
+
+///|
+pub extend DecodeLimits with @moonbitlang/core/debug.Debug::{to_repr}
+
+///|
+pub extend DecodeLimits with Eq::{not_equal, equal}

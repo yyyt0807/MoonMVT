@@ -1,21 +1,21 @@
 ///|
 test "complete fixture round trips through the public codec" {
   let original = fixture_tile()
-  let bytes = encode_tile(original)
-  let decoded = decode_tile(bytes)
+  let bytes = @codec.encode_tile(original)
+  let decoded = @codec.decode_tile(bytes)
   assert_eq(decoded, original)
-  assert_eq(encode_tile(decoded), bytes)
+  assert_eq(@codec.encode_tile(decoded), bytes)
 }
 
 ///|
 test "decoder accepts an empty tile" {
-  assert_eq(decode_tile(b""), @model.Tile::empty())
+  assert_eq(@codec.decode_tile(b""), @model.Tile::empty())
 }
 
 ///|
 test "decoder accepts a mapbox-vector-tile 2.2.0 fixture" {
   let bytes = b"\x1a\x37\x0a\x07interop\x12\x0f\x08\x2a\x12\x04\x00\x00\x01\x01\x18\x01\x22\x03\x09\x0e\x16\x1a\x04name\x1a\x02ok\x22\x08\x0a\x06python\x22\x02\x38\x01\x28\x80\x20\x78\x02"
-  let tile = decode_tile(bytes)
+  let tile = @codec.decode_tile(bytes)
   let layer = tile.layers[0]
   let feature = layer.features[0]
   assert_eq(layer.name, "interop")
@@ -50,7 +50,7 @@ test "decoder skips unknown fields at every message level" {
   let tile = @wire.Writer::new()
   tile.write_message_field(3, layer)
   tile.write_varint_field(100, 4UL)
-  let decoded = decode_tile(tile.finish())
+  let decoded = @codec.decode_tile(tile.finish())
   assert_eq(decoded.layers[0].name, "x")
   assert_eq(decoded.layers[0].values, [@model.MvtValue::StringValue("road")])
 }
@@ -65,7 +65,7 @@ test "decoder rejects missing required layer fields" {
     let tile = @wire.Writer::new()
     tile.write_message_field(3, layer)
     let mut rejected = false
-    ignore(decode_tile(tile.finish())) catch {
+    ignore(@codec.decode_tile(tile.finish())) catch {
       _ => rejected = true
     }
     assert_true(rejected)
@@ -81,7 +81,7 @@ test "decoder rejects duplicate singular fields" {
   let tile = @wire.Writer::new()
   tile.write_message_field(3, layer)
   let mut rejected = false
-  ignore(decode_tile(tile.finish())) catch {
+  ignore(@codec.decode_tile(tile.finish())) catch {
     _ => rejected = true
   }
   assert_true(rejected)
@@ -101,7 +101,7 @@ test "decoder rejects a value with zero or multiple variants" {
     let tile = @wire.Writer::new()
     tile.write_message_field(3, layer)
     let mut rejected = false
-    ignore(decode_tile(tile.finish())) catch {
+    ignore(@codec.decode_tile(tile.finish())) catch {
       _ => rejected = true
     }
     assert_true(rejected)
@@ -119,7 +119,7 @@ test "decoder rejects noncanonical boolean payload" {
   let tile = @wire.Writer::new()
   tile.write_message_field(3, layer)
   let mut rejected = false
-  ignore(decode_tile(tile.finish())) catch {
+  ignore(@codec.decode_tile(tile.finish())) catch {
     _ => rejected = true
   }
   assert_true(rejected)
@@ -133,7 +133,7 @@ test "decoder rejects a wire type mismatch" {
   let tile = @wire.Writer::new()
   tile.write_message_field(3, layer)
   let mut rejected = false
-  ignore(decode_tile(tile.finish())) catch {
+  ignore(@codec.decode_tile(tile.finish())) catch {
     _ => rejected = true
   }
   assert_true(rejected)
@@ -150,7 +150,7 @@ test "decoder enforces layer and feature count limits" {
   tile.write_message_field(3, layer)
   tile.write_message_field(3, layer)
   let mut rejected = false
-  ignore(decode_tile(tile.finish(), limits=one_layer)) catch {
+  ignore(@codec.decode_tile(tile.finish(), limits=one_layer)) catch {
     _ => rejected = true
   }
   assert_true(rejected)
@@ -173,7 +173,7 @@ test "decoder enforces packed geometry word limits" {
   let tile = @wire.Writer::new()
   tile.write_message_field(3, layer)
   let mut rejected = false
-  ignore(decode_tile(tile.finish(), limits=tiny)) catch {
+  ignore(@codec.decode_tile(tile.finish(), limits=tiny)) catch {
     _ => rejected = true
   }
   assert_true(rejected)
@@ -193,7 +193,7 @@ test "decoder preserves all numeric value variants" {
   let tile : @model.Tile = {
     layers: [{ ..original.layers[0], values: variants, features: [], }],
   }
-  let decoded = decode_tile(encode_tile(tile))
+  let decoded = @codec.decode_tile(@codec.encode_tile(tile))
   assert_eq(decoded.layers[0].values.length(), variants.length())
   for index, value in variants {
     assert_true(decoded.layers[0].values[index].dictionary_equal(value))

@@ -1,16 +1,16 @@
 ///|
 test "standard and constrained limits are valid" {
-  DecodeLimits::standard().validate()
-  DecodeLimits::constrained().validate()
+  @limits.DecodeLimits::standard().validate()
+  @limits.DecodeLimits::constrained().validate()
   assert_true(
-    DecodeLimits::standard().max_tile_bytes >
-    DecodeLimits::constrained().max_tile_bytes,
+    @limits.DecodeLimits::standard().max_tile_bytes >
+    @limits.DecodeLimits::constrained().max_tile_bytes,
   )
 }
 
 ///|
 test "all public counters accept their exact ceilings" {
-  let limits = DecodeLimits::constrained()
+  let limits = @limits.DecodeLimits::constrained()
   limits.check_tile_bytes(limits.max_tile_bytes)
   limits.check_layers(limits.max_layers)
   limits.check_features(limits.max_features_per_layer)
@@ -25,7 +25,7 @@ test "all public counters accept their exact ceilings" {
 
 ///|
 test "counters reject values above their ceilings" {
-  let limits = DecodeLimits::constrained()
+  let limits = @limits.DecodeLimits::constrained()
   let mut failures = 0
   limits.check_layers(limits.max_layers + 1) catch {
     _ => failures += 1
@@ -60,7 +60,7 @@ test "counters reject values above their ceilings" {
 ///|
 test "negative counter is caller misuse instead of a resource limit" {
   let mut error_code = ""
-  DecodeLimits::standard().check_layers(-1) catch {
+  @limits.DecodeLimits::standard().check_layers(-1) catch {
     error => error_code = error.code()
   }
   assert_eq(error_code, "MOONMVT_ARGUMENT")
@@ -68,14 +68,14 @@ test "negative counter is caller misuse instead of a resource limit" {
 
 ///|
 test "invalid configurations are rejected" {
-  let standard = DecodeLimits::standard()
-  let zero_layers : DecodeLimits = { ..standard, max_layers: 0, }
+  let standard = @limits.DecodeLimits::standard()
+  let zero_layers : @limits.DecodeLimits = { ..standard, max_layers: 0, }
   let mut zero_rejected = false
   zero_layers.validate() catch {
     _ => zero_rejected = true
   }
   assert_true(zero_rejected)
-  let inconsistent : DecodeLimits = {
+  let inconsistent : @limits.DecodeLimits = {
     ..standard,
     max_tile_bytes: 10,
     max_submessage_bytes: 11,

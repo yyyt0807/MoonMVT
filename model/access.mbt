@@ -23,7 +23,7 @@ pub fn Layer::feature_by_id(self : Layer, id : UInt64) -> Feature? {
 pub fn Layer::resolve_properties(
   self : Layer,
   feature : Feature,
-  feature_path? : String = "feature",
+  feature_path~ : String = "feature",
 ) -> Array[Property] raise @error.MvtError {
   if feature.tags.length() % 2 != 0 {
     raise @error.MvtError::InvalidTile(

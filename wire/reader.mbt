@@ -3,16 +3,16 @@
 /// indexes into the source Bytes value.
 pub(all) struct Reader {
   data : Bytes
-  mut cursor : Int
-  end : Int
+  mut cursor : Int32
+  end : Int32
   limits : @limits.DecodeLimits
-  mut unknown_fields : Int
+  mut unknown_fields : Int32
 }
 
 ///|
 pub fn Reader::new(
   data : Bytes,
-  limits? : @limits.DecodeLimits = @limits.DecodeLimits::standard(),
+  limits~ : @limits.DecodeLimits = @limits.DecodeLimits::standard(),
 ) -> Reader raise @error.MvtError {
   limits.validate()
   limits.check_tile_bytes(data.length())
@@ -38,12 +38,12 @@ fn Reader::from_range(
 }
 
 ///|
-pub fn Reader::position(self : Reader) -> Int {
+pub fn Reader::position(self : Reader) -> Int32 {
   self.cursor
 }
 
 ///|
-pub fn Reader::remaining(self : Reader) -> Int {
+pub fn Reader::remaining(self : Reader) -> Int32 {
   self.end - self.cursor
 }
 
@@ -53,7 +53,7 @@ pub fn Reader::is_done(self : Reader) -> Bool {
 }
 
 ///|
-pub fn Reader::unknown_field_count(self : Reader) -> Int {
+pub fn Reader::unknown_field_count(self : Reader) -> Int32 {
   self.unknown_fields
 }
 
@@ -85,10 +85,10 @@ pub fn Reader::read_varint(
 ///|
 fn decode_varint_bounded(
   data : Bytes,
-  offset : Int,
-  end : Int,
+  offset : Int32,
+  end : Int32,
   context : String,
-) -> (UInt64, Int) raise @error.MvtError {
+) -> (UInt64, Int32) raise @error.MvtError {
   let mut value = 0UL
   let mut shift = 0
   let mut cursor = offset
@@ -124,7 +124,7 @@ fn decode_varint_bounded(
 pub fn Reader::read_fixed32(
   self : Reader,
   context : String,
-) -> UInt raise @error.MvtError {
+) -> UInt32 raise @error.MvtError {
   self.require_bytes(4, context)
   let offset = self.cursor
   self.cursor += 4
@@ -234,7 +234,7 @@ pub fn Reader::expect_wire(
 ///|
 fn Reader::require_bytes(
   self : Reader,
-  count : Int,
+  count : Int32,
   context : String,
 ) -> Unit raise @error.MvtError {
   if count < 0 {
@@ -250,10 +250,10 @@ fn Reader::require_bytes(
 pub fn Reader::read_packed_uint32(
   self : Reader,
   path : String,
-  maximum_words : Int,
-) -> Array[Int] raise @error.MvtError {
+  maximum_words : Int32,
+) -> Array[Int32] raise @error.MvtError {
   let packed = self.read_subreader(path)
-  let values : Array[Int] = []
+  let values : Array[Int32] = []
   while !packed.is_done() {
     if values.length() >= maximum_words {
       raise @error.MvtError::ResourceLimit(
@@ -278,10 +278,10 @@ pub fn Reader::read_packed_uint32(
 pub fn Reader::read_packed_words(
   self : Reader,
   path : String,
-  maximum_words : Int,
-) -> Array[UInt] raise @error.MvtError {
+  maximum_words : Int32,
+) -> Array[UInt32] raise @error.MvtError {
   let packed = self.read_subreader(path)
-  let values : Array[UInt] = []
+  let values : Array[UInt32] = []
   while !packed.is_done() {
     if values.length() >= maximum_words {
       raise @error.MvtError::ResourceLimit(

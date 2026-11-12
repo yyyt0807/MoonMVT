@@ -1,19 +1,20 @@
 ///|
 /// Resolved feature information supplied to query predicates.
+#derive(Debug, Eq)
 pub(all) struct FeatureView {
-  index : Int
+  index : Int32
   id : UInt64?
   geometry_type : @model.GeomType
   properties : Array[@model.Property]
   bounds : @model.Bounds?
-  path_count : Int
-  point_count : Int
-} derive(Debug, Eq)
+  path_count : Int32
+  point_count : Int32
+}
 
 ///|
 pub fn inspect_feature(
   layer : @model.Layer,
-  index : Int,
+  index : Int32,
 ) -> FeatureView raise @error.MvtError {
   if index < 0 || index >= layer.features.length() {
     raise @error.MvtError::InvalidArgument("feature index is outside layer")
@@ -144,20 +145,21 @@ pub fn map_tile_layers(
 }
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct LayerStatistics {
   name : String
-  extent : Int
-  features : Int
-  point_features : Int
-  line_features : Int
-  polygon_features : Int
-  unknown_features : Int
-  properties : Int
-  geometry_words : Int
-  decoded_points : Int
-  dictionary_keys : Int
-  dictionary_values : Int
-} derive(Debug, Eq)
+  extent : Int32
+  features : Int32
+  point_features : Int32
+  line_features : Int32
+  polygon_features : Int32
+  unknown_features : Int32
+  properties : Int32
+  geometry_words : Int32
+  decoded_points : Int32
+  dictionary_keys : Int32
+  dictionary_values : Int32
+}
 
 ///|
 pub fn layer_statistics(
@@ -198,14 +200,15 @@ pub fn layer_statistics(
 }
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct TileStatistics {
-  layers : Int
-  features : Int
-  properties : Int
-  geometry_words : Int
-  decoded_points : Int
+  layers : Int32
+  features : Int32
+  properties : Int32
+  geometry_words : Int32
+  decoded_points : Int32
   layer_statistics : Array[LayerStatistics]
-} derive(Debug, Eq)
+}
 
 ///|
 pub fn tile_statistics(
@@ -233,3 +236,21 @@ pub fn tile_statistics(
     layer_statistics: statistics,
   }
 }
+
+///|
+pub extend FeatureView with @moonbitlang/core/debug.Debug::{to_repr}
+
+///|
+pub extend FeatureView with Eq::{not_equal, equal}
+
+///|
+pub extend LayerStatistics with @moonbitlang/core/debug.Debug::{to_repr}
+
+///|
+pub extend LayerStatistics with Eq::{not_equal, equal}
+
+///|
+pub extend TileStatistics with @moonbitlang/core/debug.Debug::{to_repr}
+
+///|
+pub extend TileStatistics with Eq::{not_equal, equal}

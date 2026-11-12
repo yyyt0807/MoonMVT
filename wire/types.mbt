@@ -1,28 +1,31 @@
 ///|
 /// Protocol Buffers wire types accepted by MVT.
+#derive(Debug, Eq)
 pub(all) enum WireType {
   Varint
   Fixed64
   LengthDelimited
   Fixed32
-} derive(Debug, Eq)
+}
 
 ///|
 /// Decoded protobuf field key.
+#derive(Debug, Eq)
 pub(all) struct FieldKey {
-  number : Int
+  number : Int32
   wire_type : WireType
-} derive(Debug, Eq)
+}
 
 ///|
 /// A length-delimited slice into the original byte document.
+#derive(Debug, Eq)
 pub(all) struct ByteRange {
-  start : Int
-  end : Int
-} derive(Debug, Eq)
+  start : Int32
+  end : Int32
+}
 
 ///|
-pub fn ByteRange::length(self : ByteRange) -> Int {
+pub fn ByteRange::length(self : ByteRange) -> Int32 {
   self.end - self.start
 }
 
@@ -32,7 +35,7 @@ pub fn ByteRange::is_empty(self : ByteRange) -> Bool {
 }
 
 ///|
-pub fn wire_type_number(wire_type : WireType) -> Int {
+pub fn wire_type_number(wire_type : WireType) -> Int32 {
   match wire_type {
     Varint => 0
     Fixed64 => 1
@@ -43,8 +46,8 @@ pub fn wire_type_number(wire_type : WireType) -> Int {
 
 ///|
 pub fn wire_type_from_number(
-  value : Int,
-  offset : Int,
+  value : Int32,
+  offset : Int32,
 ) -> WireType raise @error.MvtError {
   match value {
     0 => Varint
@@ -58,3 +61,21 @@ pub fn wire_type_from_number(
       )
   }
 }
+
+///|
+pub extend ByteRange with @moonbitlang/core/debug.Debug::{to_repr}
+
+///|
+pub extend ByteRange with Eq::{not_equal, equal}
+
+///|
+pub extend FieldKey with @moonbitlang/core/debug.Debug::{to_repr}
+
+///|
+pub extend FieldKey with Eq::{not_equal, equal}
+
+///|
+pub extend WireType with @moonbitlang/core/debug.Debug::{to_repr}
+
+///|
+pub extend WireType with Eq::{not_equal, equal}

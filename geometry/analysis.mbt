@@ -1,9 +1,10 @@
 ///|
+#derive(Debug, Eq)
 pub(all) enum RingWinding {
   Clockwise
   CounterClockwise
   Degenerate
-} derive(Debug, Eq)
+}
 
 ///|
 pub fn RingWinding::name(self : RingWinding) -> String {
@@ -15,14 +16,15 @@ pub fn RingWinding::name(self : RingWinding) -> String {
 }
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct RingInfo {
-  index : Int
+  index : Int32
   winding : RingWinding
   signed_area2 : Double
   bounds : @model.Bounds
-  point_count : Int
-  distinct_points : Int
-} derive(Debug, Eq)
+  point_count : Int32
+  distinct_points : Int32
+}
 
 ///|
 pub fn geometry_bounds(geometry : DecodedGeometry) -> @model.Bounds? {
@@ -68,7 +70,7 @@ pub fn ring_winding(path : Path) -> RingWinding {
 }
 
 ///|
-pub fn path_distinct_point_count(path : Path) -> Int {
+pub fn path_distinct_point_count(path : Path) -> Int32 {
   let mut count = 0
   for index, point in path.points {
     let mut seen = false
@@ -86,7 +88,7 @@ pub fn path_distinct_point_count(path : Path) -> Int {
 }
 
 ///|
-pub fn path_duplicate_step_count(path : Path) -> Int {
+pub fn path_duplicate_step_count(path : Path) -> Int32 {
   let mut count = 0
   for index in 1..<path.points.length() {
     if path.points[index] == path.points[index - 1] {
@@ -147,7 +149,7 @@ pub fn polygon_ring_info(
 /// polygon and counterclockwise rings following it are holes.
 pub fn validate_polygon_rings(
   geometry : DecodedGeometry,
-  path? : String = "geometry",
+  path~ : String = "geometry",
 ) -> Unit raise @error.MvtError {
   let infos = polygon_ring_info(geometry)
   let mut have_exterior = false
@@ -171,3 +173,15 @@ pub fn validate_polygon_rings(
     }
   }
 }
+
+///|
+pub extend RingInfo with @moonbitlang/core/debug.Debug::{to_repr}
+
+///|
+pub extend RingInfo with Eq::{not_equal, equal}
+
+///|
+pub extend RingWinding with @moonbitlang/core/debug.Debug::{to_repr}
+
+///|
+pub extend RingWinding with Eq::{not_equal, equal}

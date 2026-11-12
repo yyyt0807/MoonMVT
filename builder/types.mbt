@@ -1,11 +1,12 @@
 ///|
 /// User-facing feature description with resolved properties.
+#derive(Debug, Eq)
 pub(all) struct FeatureInput {
   id : UInt64?
   properties : Array[@model.Property]
   geometry_type : @model.GeomType
-  geometry : Array[UInt]
-} derive(Debug, Eq)
+  geometry : Array[UInt32]
+}
 
 ///|
 pub fn property(key : String, value : @model.MvtValue) -> @model.Property {
@@ -15,9 +16,9 @@ pub fn property(key : String, value : @model.MvtValue) -> @model.Property {
 ///|
 pub fn FeatureInput::raw(
   geometry_type : @model.GeomType,
-  geometry : Array[UInt],
-  properties? : Array[@model.Property] = [],
-  id? : UInt64? = None,
+  geometry : Array[UInt32],
+  properties~ : Array[@model.Property] = [],
+  id~ : UInt64? = None,
 ) -> FeatureInput {
   { id, properties, geometry_type, geometry, }
 }
@@ -25,8 +26,8 @@ pub fn FeatureInput::raw(
 ///|
 pub fn FeatureInput::points(
   points : Array[@model.Point],
-  properties? : Array[@model.Property] = [],
-  id? : UInt64? = None,
+  properties~ : Array[@model.Property] = [],
+  id~ : UInt64? = None,
 ) -> FeatureInput raise @error.MvtError {
   {
     id,
@@ -39,8 +40,8 @@ pub fn FeatureInput::points(
 ///|
 pub fn FeatureInput::lines(
   lines : Array[Array[@model.Point]],
-  properties? : Array[@model.Property] = [],
-  id? : UInt64? = None,
+  properties~ : Array[@model.Property] = [],
+  id~ : UInt64? = None,
 ) -> FeatureInput raise @error.MvtError {
   {
     id,
@@ -53,8 +54,8 @@ pub fn FeatureInput::lines(
 ///|
 pub fn FeatureInput::polygons(
   rings : Array[Array[@model.Point]],
-  properties? : Array[@model.Property] = [],
-  id? : UInt64? = None,
+  properties~ : Array[@model.Property] = [],
+  id~ : UInt64? = None,
 ) -> FeatureInput raise @error.MvtError {
   let geometry = @geometry.encode_polygons(rings)
   @geometry.validate_polygon_rings(
@@ -67,7 +68,7 @@ pub fn FeatureInput::polygons(
 /// Mutable layer assembly state. `finish` returns owned snapshots.
 pub(all) struct LayerBuilder {
   name : String
-  extent : Int
+  extent : Int32
   mut features : Array[@model.Feature]
   mut keys : Array[String]
   mut values : Array[@model.MvtValue]
@@ -76,7 +77,7 @@ pub(all) struct LayerBuilder {
 ///|
 pub fn LayerBuilder::new(
   name : String,
-  extent? : Int = 4096,
+  extent~ : Int32 = 4096,
 ) -> LayerBuilder raise @error.MvtError {
   if name == "" {
     raise @error.MvtError::InvalidArgument("layer name must not be empty")
@@ -88,17 +89,17 @@ pub fn LayerBuilder::new(
 }
 
 ///|
-pub fn LayerBuilder::feature_count(self : LayerBuilder) -> Int {
+pub fn LayerBuilder::feature_count(self : LayerBuilder) -> Int32 {
   self.features.length()
 }
 
 ///|
-pub fn LayerBuilder::key_count(self : LayerBuilder) -> Int {
+pub fn LayerBuilder::key_count(self : LayerBuilder) -> Int32 {
   self.keys.length()
 }
 
 ///|
-pub fn LayerBuilder::value_count(self : LayerBuilder) -> Int {
+pub fn LayerBuilder::value_count(self : LayerBuilder) -> Int32 {
   self.values.length()
 }
 
@@ -125,7 +126,7 @@ pub fn TileBuilder::new() -> TileBuilder {
 }
 
 ///|
-pub fn TileBuilder::layer_count(self : TileBuilder) -> Int {
+pub fn TileBuilder::layer_count(self : TileBuilder) -> Int32 {
   self.layers.length()
 }
 
@@ -133,3 +134,9 @@ pub fn TileBuilder::layer_count(self : TileBuilder) -> Int {
 pub fn TileBuilder::finish(self : TileBuilder) -> @model.Tile {
   { layers: self.layers.copy(), }
 }
+
+///|
+pub extend FeatureInput with @moonbitlang/core/debug.Debug::{to_repr}
+
+///|
+pub extend FeatureInput with Eq::{not_equal, equal}

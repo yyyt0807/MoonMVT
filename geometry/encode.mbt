@@ -2,13 +2,13 @@
 /// Encode a single- or multi-point geometry.
 pub fn encode_points(
   points : ArrayView[@model.Point],
-) -> Array[UInt] raise @error.MvtError {
+) -> Array[UInt32] raise @error.MvtError {
   if points.is_empty() {
     raise @error.MvtError::InvalidArgument(
       "point geometry requires at least one point",
     )
   }
-  let output : Array[UInt] = [
+  let output : Array[UInt32] = [
     command_header(CommandId::MoveTo, points.length()),
   ]
   let cursor : Cursor = { x: 0L, y: 0L, }
@@ -22,13 +22,13 @@ pub fn encode_points(
 /// Encode one or more lines. Every line must contain at least two points.
 pub fn encode_lines(
   lines : ArrayView[Array[@model.Point]],
-) -> Array[UInt] raise @error.MvtError {
+) -> Array[UInt32] raise @error.MvtError {
   if lines.is_empty() {
     raise @error.MvtError::InvalidArgument(
       "line geometry requires at least one line",
     )
   }
-  let output : Array[UInt] = []
+  let output : Array[UInt32] = []
   let cursor : Cursor = { x: 0L, y: 0L, }
   for index, line in lines {
     if line.length() < 2 {
@@ -56,13 +56,13 @@ pub fn encode_lines(
 /// not be repeated at the end because ClosePath carries closure semantics.
 pub fn encode_polygons(
   rings : ArrayView[Array[@model.Point]],
-) -> Array[UInt] raise @error.MvtError {
+) -> Array[UInt32] raise @error.MvtError {
   if rings.is_empty() {
     raise @error.MvtError::InvalidArgument(
       "polygon geometry requires at least one ring",
     )
   }
-  let output : Array[UInt] = []
+  let output : Array[UInt32] = []
   let cursor : Cursor = { x: 0L, y: 0L, }
   for index, ring in rings {
     validate_open_ring_input(ring, index)
@@ -86,7 +86,7 @@ pub fn encode_polygons(
 /// Re-encode an expanded geometry using its declared geometry type.
 pub fn encode_decoded(
   geometry : DecodedGeometry,
-) -> Array[UInt] raise @error.MvtError {
+) -> Array[UInt32] raise @error.MvtError {
   let points : Array[@model.Point] = []
   let paths : Array[Array[@model.Point]] = []
   match geometry.geometry_type {
@@ -138,7 +138,7 @@ priv struct Cursor {
 
 ///|
 fn append_point(
-  output : Array[UInt],
+  output : Array[UInt32],
   cursor : Cursor,
   point : @model.Point,
   path : String,
@@ -165,7 +165,7 @@ fn check_delta(value : Int64, path : String) -> Unit raise @error.MvtError {
 ///|
 fn validate_open_ring_input(
   ring : Array[@model.Point],
-  index : Int,
+  index : Int32,
 ) -> Unit raise @error.MvtError {
   if ring.length() < 3 {
     raise @error.MvtError::InvalidArgument(
